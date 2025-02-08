@@ -13,3 +13,5 @@ class Route:
     time: int # minutes
     distance: int # yards
     route: list[tuple[float, float]]
+
+# [Route]

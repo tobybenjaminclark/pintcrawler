@@ -27,16 +27,16 @@ def get_route(start: PubData, end: PubData, gmaps: googlemaps.Client, routes_cac
     directions = gmaps.directions(
         origin=(start.latitude, start.longitude),
         destination=(end.latitude, end.longitude),
-        mode="walking", 
+        mode="walking",
         departure_time=datetime.datetime.now()
     )
-    
+
     if not directions:
-        return None 
+        return None
 
     route = directions[0]
     distance = route['legs'][0]['distance']['text']
-    duration = route['legs'][0]['duration']['text']  
+    duration = route['legs'][0]['duration']['text']
 
     return (start.name, end.name, distance, convert_duration_to_minutes(duration))
 
@@ -51,7 +51,7 @@ def convert_duration_to_minutes(duration_str: str) -> int:
 
 
 def fetch_pub_routes(pubs: list[PubData]) -> list[tuple]:
-    
+
     routes_cache = set()
     routes = []
 
@@ -62,7 +62,7 @@ def fetch_pub_routes(pubs: list[PubData]) -> list[tuple]:
             for nearest_pub in nearest_pubs:
                 future = executor.submit(get_route, pub, nearest_pub, gmaps, routes_cache)
                 future_to_route[future] = (pub, nearest_pub)
-        
+
         for future in future_to_route:
             result = future.result()
             if result:
@@ -73,7 +73,7 @@ def fetch_pub_routes(pubs: list[PubData]) -> list[tuple]:
 
 def create_graph_from_routes(routes: list[tuple[str, str, str, str]], pubs: list[PubData]) -> UndirectedGraph:
     g = UndirectedGraph()
-    pub_map = {pub.name: Location(pub.latitude, pub.longitude, pub.name, 
+    pub_map = {pub.name: Location(pub.latitude, pub.longitude, pub.name,
                                   attr = {"address": pub.address, "source": pub.source, "distance_km": pub.distance_km,
                                           "place_id": pub.place_id, "rating":pub.rating, "user_ratings_total": pub.user_ratings_total,
                                           "phone_number": pub.phone_number, "photo_reference": pub.photo_reference}) for pub in pubs}
@@ -93,30 +93,30 @@ def create_graph_from_routes(routes: list[tuple[str, str, str, str]], pubs: list
 def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Location], pub_map) -> UndirectedGraph:
     # Simple approach to ensure the graph is connected:
     # If there are disconnected components, add edges between them.
-    
+
     connected_pubs = set()
-    
+
     def dfs(pub, visited):
         visited.add(pub.name)
         connected_pubs.add(pub.name)
         for neighbor in graph.get_neighbors(pub):
             if neighbor[0].name not in visited:
                 dfs(neighbor[0], visited)
-    
+
     # Start DFS from the first pub to mark all reachable pubs
     visited = set()
     starting_vertex = graph.vertices()[0]
     print(graph.adjacency_list)
 
     dfs(starting_vertex, visited)
-    
+
     # If not all pubs are visited, add the shortest edges between unconnected pubs
     for pub in pubs:
         if pub.name not in connected_pubs:
             # Find the nearest connected pub
             nearest_pub = min(connected_pubs, key=lambda connected_pub: geodesic(
-                (pub.latitude, pub.longitude), 
-                (next(p for p in pubs if p.name == connected_pub).latitude, 
+                (pub.latitude, pub.longitude),
+                (next(p for p in pubs if p.name == connected_pub).latitude,
                  next(p for p in pubs if p.name == connected_pub).longitude)).km)
 
             # Add the shortest edge
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     routes = fetch_pub_routes(pubs)
 
     graph, pub_map = create_graph_from_routes(routes, pubs)
-    
+
     # Add shortest routes to connect disconnected components
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     print("")
     print("")
 
-
+    
 
     visualize_graph(graph)
 
