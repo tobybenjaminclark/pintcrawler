@@ -37,10 +37,8 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
     """
     gmaps = googlemaps.Client(key=api_key)
     
-    # Use search keyword "pub" instead of places_nearby
     places = gmaps.places(
         location=(latitude, longitude),
-        radius=radius_meters,
         query="pub"
     )
     
@@ -84,7 +82,21 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
             photo_reference=photo_reference
         ))
     
+    pubs = filter_pubs_within_radius(pubs, latitude, longitude, radius_meters)
     return pubs
+
+def filter_pubs_within_radius(pubs: list, latitude: float, longitude: float, search_radius_km: float) -> list:
+    """
+    Filters out pubs that are further than the specified search radius.
+    """
+    filtered_pubs = []
+    
+    for pub in pubs:
+        distance = geodesic((latitude, longitude), (pub.latitude, pub.longitude)).km
+        if distance <= search_radius_km:
+            filtered_pubs.append(pub)
+    
+    return filtered_pubs
 
 if __name__ == "__main__":
     latitude, longitude = 52.953340, -1.149964
