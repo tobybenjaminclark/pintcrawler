@@ -7,8 +7,15 @@ mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAyb
 const Map = () => {
   const mapContainerRef = useRef(null);
 
-  const [coordinates, setCoordinates] = useState([-0.5658080564214817,51.42583195427641]);
-  const [optionVisible, setOptionVisible] = useState([false]);
+  const [coordinates, setCoordinates] = useState([-1.1815, 52.947]);
+  const [optionVisible, setOptionVisible] = useState(false);
+
+    // List of pub locations
+  const locations = [
+      { name: "Rose & Crown", coords: [-1.1836073, 52.9476102] },
+      { name: "The White Hart", coords: [-1.1793126, 52.9445159] },
+      { name: "The Three Wheatsheaves", coords: [-1.1802778, 52.9488889] }
+  ];
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -23,13 +30,20 @@ const Map = () => {
     
     map.on("click", (event) => {
         event.preventDefault();
-        
         setCoordinates([event.lngLat.lng,event.lngLat.lat]);
         console.log([event.lngLat.lng,event.lngLat.lat]);
         console.log(coordinates);
         console.log("test");
 
     })
+
+    locations.forEach((location) => {
+      new mapboxgl.Marker()
+        .setLngLat(location.coords)
+        .setPopup(new mapboxgl.Popup().setText(location.name))
+        .addTo(map);
+    });
+
 
     const toggleView = () => {
         setOptionVisible(!optionVisible);
