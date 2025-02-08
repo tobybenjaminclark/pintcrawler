@@ -10,15 +10,14 @@ class PubData:
     latitude: float
     longitude: float
     address: str = "Unknown Address"
-    source: str = "Unknown Source"
+    source: str = "Google"
     distance_km: float = 0.0
     place_id: str = ""
     rating: float = 0  # Default to 0 if no rating is available
     user_ratings_total: int = 0  # Total number of ratings
     phone_number: str = "Unknown Phone Number"
     website: str = "Unknown Website"
-    price_level: int = -1  # Price level (0-4)
-    photo_reference: str = ""  # Photo reference for fetching photos
+    photo_reference: str = "" 
 
     def __str__(self):
         return (f"Pub: {self.name}\n"
@@ -26,12 +25,15 @@ class PubData:
                 f"Address: {self.address}\n"
                 f"Location: ({self.latitude}, {self.longitude})\n"
                 f"Distance: {self.distance_km} km\n"
-                f"Rating: {self.rating}\n"
+                f"Rating: {self.rating} ({self.user_ratings_total} ratings)\n"
+                f"Phone: {self.phone_number}\n"
+                f"Website: {self.website}\n"
                 f"Photo Reference: {self.photo_reference if self.photo_reference else 'No Photos'}\n")
+
 
 def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int) -> list[PubData]:
     """
-    Fetches pubs from Google Places API within a given radius and includes detailed information.
+    Fetches pubs from Google Places API within a given radius and includes detailed information from Contact and Atmosphere categories.
     """
     gmaps = googlemaps.Client(key=api_key)
     
@@ -44,17 +46,28 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
     pubs = []
     for place in places.get("results", []):
         pub_name = place.get("name", "Unknown Pub")
-        lat = place["geometry"]["location"]["lat"]
-        lon = place["geometry"]["location"]["lng"]
+        lat, lon = place["geometry"]["location"].values()
         address = place.get("vicinity", "Unknown Address")
         place_id = place.get("place_id", "")
-        rating = place.get("rating", -1.0)
         
+        # Fetch additional details for each pub using place_details
+        place_details = gmaps.place(
+            place_id=place_id,
+            fields=["formatted_address", "formatted_phone_number", "international_phone_number", "opening_hours", 
+                    "website", "rating", "user_ratings_total", "photo", "serves_beer", 
+                    "serves_breakfast", "serves_brunch", "serves_dinner", "serves_lunch", "serves_vegetarian_food"]
+        )
+        
+        details = place_details.get("result", {})
+        rating = details.get("rating", 0.0)
+        user_ratings_total = details.get("user_ratings_total", 0)
+        phone_number = details.get("formatted_phone_number", "Unknown Phone Number")
+        website = details.get("website", "Unknown Website")
+
         # Optionally, check for photos (only first photo reference for now)
-        photo_reference = ""
-        if "photos" in place:
-            photo_reference = place["photos"][0].get("photo_reference", "")
+        photo_reference = details.get("photos", [{}])[0].get("photo_reference", "")
         
+        # Calculate distance
         distance = geodesic((latitude, longitude), (lat, lon)).km
         pubs.append(PubData(
             name=pub_name,
@@ -64,10 +77,11 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
             source="Google",
             distance_km=round(distance, 2),
             rating=rating,
-            place_id=place_id,
+            user_ratings_total=user_ratings_total,
+            phone_number=phone_number,
+            website=website,
             photo_reference=photo_reference
         ))
-    
     return pubs
 
 
