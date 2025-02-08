@@ -3,13 +3,13 @@ from dataclasses import dataclass
 @dataclass
 class Pub:
     name: str
-    loc: [float, float]
-    rating: int # 1 to 5
+    loc: tuple[float, float]
+    rating: int
 
 @dataclass
 class Route:
     start_node: Pub
     end_node: Pub
-    time: int # minutes
-    distance: int # yards
+    time: int
+    distance: int 
     route: list[tuple[float, float]]

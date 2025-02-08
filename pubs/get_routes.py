@@ -1,4 +1,5 @@
 import datetime
+import json
 import googlemaps
 from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
@@ -6,6 +7,7 @@ from get_pubs import PubData, get_pubs, normalize_pub_ratings
 from api_key import API_KEY
 from graph import UndirectedGraph
 from location import Location
+from route import Pub, Route
 from visualise import visualize_graph
 from router import get_all_routes
 import re
@@ -72,7 +74,6 @@ def convert_duration_to_minutes(duration_str: str) -> int:
 
 
 def fetch_pub_routes(pubs: list[PubData]) -> list[tuple]:
-    
     routes_cache = set()
     routes = []
 
@@ -147,63 +148,73 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
     return graph
 
 
+def convert_route_to_json(routes: list[tuple[str, str, str, str]], pubs: list[Pub]) -> list[Route]:
+    best_routes = []
 
-if __name__ == "__main__":
-    latitude, longitude = 52.953250, -1.150500
+    for start_name, end_name, args in routes:
+        start_pub = next(pub for pub in pubs if pub.name == start_name)
+        end_pub = next(pub for pub in pubs if pub.name == end_name)
+        
+        time = args["duration"]
+        distance = int(args["distance"].split()[0])
+        
+        route = Route(
+            start_node=start_pub,
+            end_node=end_pub,
+            time=time,
+            distance=distance,
+            route=args["route_coordinates"]
+        )
+        
+        best_routes.append(route)
 
-    radius_km = 3
+    best_routes.sort(key=lambda r: (r.time, r.distance))
 
-    pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
+    return json.dumps(best_routes)
 
-    pubs = normalize_pub_ratings(pubs)
-    routes = fetch_pub_routes(pubs)
-    for route in routes:
-        print(route)
-
-    graph, pub_map = create_graph_from_routes(routes, pubs)
-    
-    # Add shortest routes to connect disconnected components
-    graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
-
-    # Get all routes starting from each pub
-    routes_by_pub = get_all_routes(graph)
-
-    gl_routes = []
-    for start_pub, routes in routes_by_pub.items():
-        for route, w in routes:
-            gl_routes.append((route, w))
-
-    gl_routes = list(filter(lambda route: len(route[0]) < MAX_PUBS, gl_routes))
-
-
+def get_best_route(routes_by_pub):
     best_node_w = -math.inf
     worst_node_w = math.inf
     best_node = None
     worst_node = None
 
-    for _r, w in gl_routes:
+    for _r, w in routes_by_pub:
         if w > best_node_w:
-            best_node_w = w;
-            best_node = _r;
+            best_node_w = w
+            best_node = _r
         if w < worst_node_w:
-            worst_node_w = w;
-            worst_node = _r;
-
+            worst_node_w = w
+            worst_node = _r
+    
     print("\n\nBest Route")
     print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
     print(best_node)
+    best_nodes = []
+
     for n in best_node:
+        best_nodes.append(Pub(n.name, (n.latitude, n.longitude), n.attr["rating"]))
         print("\t> " + str(n), end="\n")
+    
+    # get the routes corresponding to this path
+    # return a list of
+    
 
-    print("\n\nWorst Route")
-    print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
-    print(worst_node)
-    for n in worst_node:
-        print("\t> " + str(n), end="\n")
-    print("")
-    print("")
+def process_pubs(latitude: float, longitude: float, radius_km: float):
+    pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
+    pubs = normalize_pub_ratings(pubs)
+    routes = fetch_pub_routes(pubs)
+    
+    graph, pub_map = create_graph_from_routes(routes, pubs)
+    graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
+    routes_by_pub = get_all_routes(graph, MAX_PUBS)
 
+    best_route = get_best_route(routes_by_pub)
 
     visualize_graph(graph)
 
+
+if __name__ == "__main__":
+    latitude, longitude = 52.953250, -1.150500
+    radius_km = 3
+    process_pubs(latitude, longitude, radius_km)

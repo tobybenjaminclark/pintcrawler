@@ -43,7 +43,7 @@ def get_all_routes_from_vertex(graph, start):
     return dfs(start, [start])
 
 
-def get_all_routes(graph):
+def get_all_routes(graph, max_pubs):
     """
     For each vertex in the graph, compute all routes starting from that vertex.
     Returns a dictionary mapping each starting vertex to the list of its routes.
@@ -51,4 +51,11 @@ def get_all_routes(graph):
     all_routes = {}
     for vertex in graph.vertices():
         all_routes[vertex] = get_all_routes_from_vertex(graph, vertex)
-    return all_routes
+        gl_routes = []
+
+    for start_pub, routes in all_routes.items():
+        for route, w in routes:
+            gl_routes.append((route, w))
+
+    gl_routes = list(filter(lambda route: len(route[0]) < max_pubs, gl_routes))
+    return gl_routes
