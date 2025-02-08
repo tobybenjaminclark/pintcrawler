@@ -1,5 +1,6 @@
 import './App.css';
 import Map from "./map";
+import logo from "./assets/logo.png"
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
       
       {/* Overlay container for UI elements */}
       <div className="overlay">
-        <h1>PintFinder</h1>
+      <img src={logo} alt="logo" />
         {/* Other overlay content */}
       </div>
     </>

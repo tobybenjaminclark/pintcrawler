@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
 const Map = () => {
   const mapContainerRef = useRef(null);
 
-  const [coordinates, setCoordinates] = useState([1,1]);
-  const [beginCoord, setBeginCoord] = useState([-0.5658080564214817,51.42583195427641])
+  const [coordinates, setCoordinates] = useState([-0.5658080564214817,51.42583195427641]);
+  const [optionVisible, setOptionVisible] = useState([false]);
+
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v11", // Change style as needed
-      center: [-0.5658080564214817,51.42583195427641], // [lng, lat]
+      center: [coordinates[0],coordinates[1]], // [lng, lat]
       zoom: 15,
     });
     map.on("load", () => {
@@ -22,12 +24,20 @@ const Map = () => {
     map.on("click", (event) => {
         event.preventDefault();
         
-        setCoordinates([event.lngLat.lat,event.lngLat.lng]);
-        console.log([event.lngLat.lat,event.lngLat.lng]);
+        setCoordinates([event.lngLat.lng,event.lngLat.lat]);
+        console.log([event.lngLat.lng,event.lngLat.lat]);
         console.log(coordinates);
         console.log("test");
 
     })
+
+    const toggleView = () => {
+        setOptionVisible(!optionVisible);
+    }
+
+    new mapboxgl.Marker()
+      .setLngLat([coordinates[0],coordinates[1]])
+      .addTo(map);
 
 
     const handleKeyDown = (event) => {
@@ -39,10 +49,6 @@ const Map = () => {
         }
       };
     document.addEventListener("keydown", handleKeyDown);
-    new mapboxgl.Marker()
-      .setLngLat([-74.5, 40])
-      .addTo(map);
-
     return () => map.remove(); // Cleanup on unmount
   }, [coordinates]);
 
