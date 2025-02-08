@@ -2,18 +2,20 @@ import datetime
 import googlemaps
 from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
-from get_pubs import PubData, get_pubs
+from get_pubs import PubData, get_pubs, normalize_pub_ratings
 from api_key import API_KEY
 from graph import UndirectedGraph
 from location import Location
 from visualise import visualize_graph
 from router import get_all_routes
 import re
+import math
 
 gmaps = googlemaps.Client(key=API_KEY)
 
+MAX_PUBS = 6
 
-def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubData]:
+def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 5) -> list[PubData]:
     distances = [(geodesic((pub.latitude, pub.longitude), (other_pub.latitude, other_pub.longitude)).km, other_pub)
                  for other_pub in pubs if other_pub != pub]
     distances.sort(key=lambda x: x[0])
@@ -137,9 +139,9 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
                 (pub.latitude, pub.longitude), 
                 (next(p for p in pubs if p.name == connected_pub).latitude, 
                  next(p for p in pubs if p.name == connected_pub).longitude)).km)
-            
-            new_route = get_route(pub_map[nearest_pub], pub_map[pub.name], gmaps, set())
+
             # Add the shortest edge
+            new_route = get_route(pub_map[nearest_pub], pub_map[pub.name], gmaps, set())
             graph.add_edge(pub_map[nearest_pub], pub_map[pub.name], new_route[3])
 
     return graph
@@ -147,15 +149,13 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
 
 
 if __name__ == "__main__":
-    latitude, longitude = 52.947957, -1.182484
+    latitude, longitude = 52.953250, -1.150500
 
-    radius_km = 1
+    radius_km = 3
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
 
-    
-    for pub in pubs:
-        print(f"pub: {pub.name}\n lat: {pub.latitude}\n long:{pub.longitude}\n \n\n")
+    pubs = normalize_pub_ratings(pubs)
     routes = fetch_pub_routes(pubs)
     for route in routes:
         print(route)
@@ -165,17 +165,45 @@ if __name__ == "__main__":
     # Add shortest routes to connect disconnected components
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
-    """# Get all routes starting from each pub
+    # Get all routes starting from each pub
     routes_by_pub = get_all_routes(graph)
 
-    # Print out the routes for each starting pub
+    gl_routes = []
     for start_pub, routes in routes_by_pub.items():
-        print(f"Routes starting from {start_pub}:")
-        for route in routes:
-            for n in route:
-                s_n = str(n)
-                print(" > " + s_n , end = "")
-            print("")"""
- 
+        for route, w in routes:
+            gl_routes.append((route, w))
+
+    gl_routes = list(filter(lambda route: len(route[0]) < MAX_PUBS, gl_routes))
+
+
+    best_node_w = -math.inf
+    worst_node_w = math.inf
+    best_node = None
+    worst_node = None
+
+    for _r, w in gl_routes:
+        if w > best_node_w:
+            best_node_w = w;
+            best_node = _r;
+        if w < worst_node_w:
+            worst_node_w = w;
+            worst_node = _r;
+
+    print("\n\nBest Route")
+    print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
+    print(best_node)
+    for n in best_node:
+        print("\t> " + str(n), end="\n")
+
+    print("\n\nWorst Route")
+    print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
+    print(worst_node)
+    for n in worst_node:
+        print("\t> " + str(n), end="\n")
+    print("")
+    print("")
+
+
+
     visualize_graph(graph)
 

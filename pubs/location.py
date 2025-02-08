@@ -17,7 +17,7 @@ class Location():
     photo_reference: str = "" """
 
     def __repr__(self) -> str:
-        return self.name
+        return self.name + " (" + str(self.attr["rating"]) + ")"
 
     def __eq__(self, other):
         if not isinstance(other, Location):
