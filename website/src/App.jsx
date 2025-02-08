@@ -1,5 +1,5 @@
 import './App.css';
-import Map from "./map";
+import Map from "./map2";
 import logo from "./assets/logo.png"
 
 function App() {

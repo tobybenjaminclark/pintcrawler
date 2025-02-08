@@ -7,7 +7,7 @@ import roseAndCrownImg from './assets/rose-and-crown.png';
 import whiteHartImg from './assets/white-hart.png';
 import threeWheatsheavesImg from './assets/three-wheatsheaves.png';
 
-mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
+mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your token
 
 const Map = () => {
   const mapContainerRef = useRef(null);
@@ -66,14 +66,13 @@ const Map = () => {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/ezequielm/cij7hk832007dapktzdyaemih",
       center: coordinates,
       zoom: 15,
     });
 
     map.on("load", () => {
       map.resize();
-
       locations.forEach((location) => {
         const popupDiv = document.createElement("div");
         popupDiv.style.textAlign = "center";
