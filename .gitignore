@@ -1,2 +1,4 @@
 env/
 api_key.py
+__pycache__/
+.idea/
