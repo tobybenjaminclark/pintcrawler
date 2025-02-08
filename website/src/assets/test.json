@@ -1,0 +1,65 @@
+{
+    "pubs": [
+      {
+        "name": "Rose & Crown",
+        "loc": [-1.1836073, 52.9476102],
+        "rating": 4,
+        "image": "./assets/rose-and-crown.png"
+      },
+      {
+        "name": "The White Hart",
+        "loc": [-1.1793126, 52.9445159],
+        "rating": 5,
+        "image": "./assets/rose-and-crown.png"
+      },
+      {
+        "name": "The Three Wheatsheaves",
+        "loc": [-1.1802778, 52.9488889],
+        "rating": 3,
+        "image": "./assets/rose-and-crown.png"
+      }
+    ],
+    "routes": [
+      {
+        "start_node": "Rose & Crown",
+        "end_node": "The Three Wheatsheaves",
+        "time": 10,
+        "distance": 200,
+        "route": [
+          [-1.1833402, 52.9477021],
+          [-1.1830892, 52.9477336],
+          [-1.182844, 52.9476144],
+          [-1.1802856, 52.9485363],
+          [-1.1804342, 52.9488203]
+        ]
+      },
+      {
+        "start_node": "Rose & Crown",
+        "end_node": "The White Hart",
+        "time": 8,
+        "distance": 150,
+        "route": [
+          [-1.1833402, 52.9477021],
+          [-1.1830892, 52.9477336],
+          [-1.182844, 52.9476144],
+          [-1.1834318, 52.9473358],
+          [-1.1807212, 52.9462673],
+          [-1.1806955, 52.9453724],
+          [-1.1794838, 52.9454115],
+          [-1.1794318, 52.944477]
+        ]
+      },
+      {
+        "start_node": "The Three Wheatsheaves",
+        "end_node": "The White Hart",
+        "time": 6,
+        "distance": 120,
+        "route": [
+          [-1.1804342, 52.9488203],
+          [-1.1802856, 52.9485363],
+          [-1.1794318, 52.944477]
+        ]
+      }
+    ]
+  }
+  
