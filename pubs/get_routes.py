@@ -71,7 +71,10 @@ def fetch_pub_routes(pubs: list[PubData]) -> list[tuple]:
 
 def create_graph_from_routes(routes: list[tuple[str, str, str, str]], pubs: list[PubData]) -> UndirectedGraph:
     g = UndirectedGraph()
-    pub_map = {pub.name: Location(pub.latitude, pub.longitude, pub.name, {"name": pub.name}) for pub in pubs}
+    pub_map = {pub.name: Location(pub.latitude, pub.longitude, pub.name, 
+                                  attr = {"address": pub.address, "source": pub.source, "distance_km": pub.distance_km,
+                                          "place_id": pub.place_id, "rating":pub.rating, "user_ratings_total": pub.user_ratings_total,
+                                          "phone_number": pub.phone_number, "photo_reference": pub.photo_reference}) for pub in pubs}
 
     for pub in pubs:
         g.add_location(pub_map[pub.name])
@@ -95,7 +98,7 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
         visited.add(pub.name)
         connected_pubs.add(pub.name)
         for neighbor in graph.get_neighbors(pub):
-            if neighbor[0].attr["name"] not in visited:
+            if neighbor[0].name not in visited:
                 dfs(neighbor[0], visited)
     
     # Start DFS from the first pub to mark all reachable pubs
@@ -135,7 +138,7 @@ if __name__ == "__main__":
     # Add shortest routes to connect disconnected components
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
-    # Get all routes starting from each pub
+    """# Get all routes starting from each pub
     routes_by_pub = get_all_routes(graph)
 
     # Print out the routes for each starting pub
@@ -146,7 +149,7 @@ if __name__ == "__main__":
                 s_n = str(n)
                 print(" > " + s_n , end = "")
             print("")
-
+    """
 
     visualize_graph(graph)
 

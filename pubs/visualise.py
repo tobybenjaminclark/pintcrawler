@@ -19,7 +19,7 @@ def visualize_graph(graph):
         # Assuming vertex is an instance of Location with 'latitude', 'longitude', and 'name' attributes
         latitudes.append(vertex.latitude)
         longitudes.append(vertex.longitude)
-        nx_graph.add_node(vertex, label=vertex.attr['name'])
+        nx_graph.add_node(vertex, label=vertex.name)
 
     # Normalize latitude and longitude to fit in a 2D space
     lat_min, lat_max = min(latitudes), max(latitudes)
