@@ -2,7 +2,7 @@ import datetime
 import googlemaps
 from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
-from get_pubs import PubData, get_pubs
+from get_pubs import PubData, get_pubs, normalize_pub_ratings
 from api_key import API_KEY
 from graph import UndirectedGraph
 from location import Location
@@ -13,6 +13,7 @@ import math
 
 gmaps = googlemaps.Client(key=API_KEY)
 
+MAX_PUBS = 6
 
 def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubData]:
     distances = [(geodesic((pub.latitude, pub.longitude), (other_pub.latitude, other_pub.longitude)).km, other_pub)
@@ -117,9 +118,9 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
                 (pub.latitude, pub.longitude), 
                 (next(p for p in pubs if p.name == connected_pub).latitude, 
                  next(p for p in pubs if p.name == connected_pub).longitude)).km)
-            
-            new_route = get_route(pub_map[nearest_pub], pub_map[pub.name], gmaps, set())
+
             # Add the shortest edge
+            new_route = get_route(pub_map[nearest_pub], pub_map[pub.name], gmaps, set())
             graph.add_edge(pub_map[nearest_pub], pub_map[pub.name], new_route[3])
 
     return graph
@@ -127,11 +128,13 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
 
 
 if __name__ == "__main__":
-    latitude, longitude = 51.4215, -0.5668
+    latitude, longitude = 53.758810, -2.707477
 
-    radius_km = 2
+    radius_km = 8
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
+
+    pubs = normalize_pub_ratings(pubs)
     routes = fetch_pub_routes(pubs)
 
     graph, pub_map = create_graph_from_routes(routes, pubs)
@@ -146,6 +149,9 @@ if __name__ == "__main__":
     for start_pub, routes in routes_by_pub.items():
         for route, w in routes:
             gl_routes.append((route, w))
+
+    gl_routes = list(filter(lambda route: len(route[0]) < MAX_PUBS, gl_routes))
+
 
     best_node_w = -math.inf
     worst_node_w = math.inf
@@ -171,6 +177,7 @@ if __name__ == "__main__":
     print(worst_node)
     for n in worst_node:
         print(" > " + str(n), end="")
+    print("")
     print("")
 
     visualize_graph(graph)

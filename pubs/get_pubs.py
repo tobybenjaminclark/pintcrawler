@@ -3,6 +3,8 @@ from geopy.distance import geodesic
 from dataclasses import dataclass
 from api_key import API_KEY
 
+RATING_OFFSET = 50
+RATING_WEIGHT = 20
 
 @dataclass
 class PubData:
@@ -36,12 +38,14 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_km: int) ->
     from Contact and Atmosphere categories within a given radius.
     """
     gmaps = googlemaps.Client(key=api_key)
-    
-    places = gmaps.places(
+
+    places = gmaps.places_nearby(
         location=(latitude, longitude),
-        query="pub"
+        radius=2000,  # radius in meters; adjust as needed
+        type="bar",  # use 'bar' as the type to capture pubs
+        keyword="pub"
     )
-    
+
     pubs = []
     for place in places.get("results", []):
         pub_name = place.get("name", "Unknown Pub")
@@ -98,8 +102,37 @@ def filter_pubs_within_radius(pubs: list, latitude: float, longitude: float, sea
     
     return filtered_pubs
 
+def normalize_pub_ratings(pubs: list[PubData]) -> list[PubData]:
+    """
+    Normalizes the ratings of pubs so that the lowest rating becomes 0 and the highest becomes 5,
+    with all others linearly scaled in between.
+    """
+    # Extract all ratings (if no pub has a rating, return as is)
+    ratings = [pub.rating for pub in pubs]
+    if not ratings:
+        return pubs
+
+    min_rating = min(ratings)
+    max_rating = max(ratings)
+
+    # If all pubs have the same rating, avoid division by zero.
+    if max_rating == min_rating:
+        for pub in pubs:
+            pub.rating = 5.0  # or you might choose to leave them unchanged
+        return pubs
+
+    # Normalize each pub's rating
+    for pub in pubs:
+        normalized_rating = (pub.rating - min_rating) / (max_rating - min_rating) * 5
+        pub.rating = round(normalized_rating, 2)  # rounding is optional
+        pub.rating = (pub.rating * RATING_WEIGHT) - RATING_OFFSET
+
+    return pubs
+
+
 if __name__ == "__main__":
-    latitude, longitude = 52.953340, -1.149964
+    latitude, longitude = 52.970067, -3.171206
+
     radius_meters = 2000  # 2km
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_meters)
