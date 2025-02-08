@@ -1,0 +1,31 @@
+/* Ensure the html, body, and root fill the viewport */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fullscreen background map */
+.map-container {
+  position: fixed; /* fixed relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;      /* behind the overlay */
+}
+
+/* Overlay container */
+.overlay {
+  position: relative;
+  z-index: 1;
+  pointer-events: none; /* Allow clicks to pass through where no interactive element exists */
+}
+
+/* If you need the h1 (or any interactive element) to handle pointer events, re-enable them */
+.overlay h1 {
+  pointer-events: auto;
+  text-align: center;
+  margin: 0px 0;
+  color: white; /* ensure contrast over the map */
+}
