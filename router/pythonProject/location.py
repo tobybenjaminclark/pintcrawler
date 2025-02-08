@@ -4,7 +4,11 @@ from dataclasses import dataclass
 class Location():
     lat: float
     long: float
+    name: str
     attr: dict
+
+    def __repr__(self) -> str:
+        return self.name
 
     def __eq__(self, other):
         if not isinstance(other, Location):
