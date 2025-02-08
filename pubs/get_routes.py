@@ -20,8 +20,27 @@ def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubD
     return [other_pub for _, other_pub in distances[:n]]
 
 
-def get_route(start: PubData, end: PubData, gmaps: googlemaps.Client, routes_cache: set) -> tuple:
+def get_route_coordinates(route) -> list:
+    """
+    Extracts the route coordinates from the directions response.
+    
+    Args:
+    - route: The directions response (from gmaps.directions).
 
+    Returns:
+    - A list of (lat, lng) tuples representing the route.
+    """
+    route_coordinates = []
+    for step in route['legs'][0]['steps']:
+        start_location = step['start_location']
+        end_location = step['end_location']
+        
+        route_coordinates.append((start_location['lat'], start_location['lng']))
+        route_coordinates.append((end_location['lat'], end_location['lng']))
+    
+    return route_coordinates
+
+def get_route(start: PubData, end: PubData, gmaps: googlemaps.Client, routes_cache: set) -> tuple:
     directions = gmaps.directions(
         origin=(start.latitude, start.longitude),
         destination=(end.latitude, end.longitude),
@@ -30,14 +49,16 @@ def get_route(start: PubData, end: PubData, gmaps: googlemaps.Client, routes_cac
     )
     
     if not directions:
-        return None 
+        return None
 
     route = directions[0]
     distance = route['legs'][0]['distance']['text']
-    duration = route['legs'][0]['duration']['text']  
-
-    return (start.name, end.name, distance, convert_duration_to_minutes(duration))
-
+    duration = route['legs'][0]['duration']['text']
+        
+    # Get the coordinates using the helper function
+    route_coordinates = get_route_coordinates(route)
+    
+    return (start.name, end.name, {"duration": convert_duration_to_minutes(duration), "distance": distance, "route_coordinates": route_coordinates})
 
 def convert_duration_to_minutes(duration_str: str) -> int:
     time_match = re.match(r"(\d+)\s*(min|mins|minute|minutes|hour|hours|h)", duration_str.lower())
@@ -79,11 +100,11 @@ def create_graph_from_routes(routes: list[tuple[str, str, str, str]], pubs: list
     for pub in pubs:
         g.add_location(pub_map[pub.name])
 
-    for start_name, end_name, distance, time in routes:
+    for start_name, end_name, args in routes:
         start_pub = pub_map.get(start_name)
         end_pub = pub_map.get(end_name)
         if start_pub and end_pub:
-            g.add_edge(start_pub, end_pub, time)
+            g.add_edge(start_pub, end_pub, args["duration"])
 
     return g, pub_map
 
@@ -126,12 +147,18 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
 
 
 if __name__ == "__main__":
-    latitude, longitude = 51.4215, -0.5668
+    latitude, longitude = 52.947957, -1.182484
 
-    radius_km = 2
+    radius_km = 1
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
+
+    
+    for pub in pubs:
+        print(f"pub: {pub.name}\n lat: {pub.latitude}\n long:{pub.longitude}\n \n\n")
     routes = fetch_pub_routes(pubs)
+    for route in routes:
+        print(route)
 
     graph, pub_map = create_graph_from_routes(routes, pubs)
     
@@ -148,8 +175,7 @@ if __name__ == "__main__":
             for n in route:
                 s_n = str(n)
                 print(" > " + s_n , end = "")
-            print("")
-    """
-
+            print("")"""
+ 
     visualize_graph(graph)
 
