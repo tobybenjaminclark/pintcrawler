@@ -30,17 +30,18 @@ class PubData:
                 f"Website: {self.website}\n"
                 f"Photo Reference: {self.photo_reference if self.photo_reference else 'No Photos'}\n")
 
-
 def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int) -> list[PubData]:
     """
-    Fetches pubs from Google Places API within a given radius and includes detailed information from Contact and Atmosphere categories.
+    Fetches pubs from Google Places API using a search query and includes detailed information 
+    from Contact and Atmosphere categories within a given radius.
     """
     gmaps = googlemaps.Client(key=api_key)
     
-    places = gmaps.places_nearby(
+    # Use search keyword "pub" instead of places_nearby
+    places = gmaps.places(
         location=(latitude, longitude),
         radius=radius_meters,
-        type="pub"
+        query="pub"
     )
     
     pubs = []
@@ -50,6 +51,7 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
         address = place.get("vicinity", "Unknown Address")
         place_id = place.get("place_id", "")
         
+        # Fetch detailed information for each pub
         place_details = gmaps.place(
             place_id=place_id,
             fields=["formatted_address", "formatted_phone_number", "international_phone_number", "opening_hours", 
@@ -81,11 +83,11 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
             website=website,
             photo_reference=photo_reference
         ))
+    
     return pubs
 
-
 if __name__ == "__main__":
-    latitude, longitude = 51.5074, -0.1278
+    latitude, longitude = 52.953340, -1.149964
     radius_meters = 2000  # 2km
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_meters)
