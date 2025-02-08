@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Map from "./map"
+import './App.css';
+import Map from "./map";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="app-container">
-      <h1>PintFinder</h1>
-         <Map />
-    </div>
-    
-    
+    <>
+      {/* Full-screen map container */}
+      <div className="map-container">
+        <Map />
+      </div>
       
+      {/* Overlay container for UI elements */}
+      <div className="overlay">
+        <h1>PintFinder</h1>
+        {/* Other overlay content */}
+      </div>
+    </>
   );
 }
 
-export default App
+export default App;

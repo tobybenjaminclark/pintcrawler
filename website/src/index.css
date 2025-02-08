@@ -63,7 +63,7 @@ button:focus-visible {
   width: 100%;   /* Full width */
   height: 80vh;  /* 80% of the viewport height */
   max-height: 1000px; /* Limit max height */
-  margin-top: 50px;
+  margin-top: 0px;
 }
 
 @media (prefers-color-scheme: light) {
