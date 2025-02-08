@@ -123,9 +123,9 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
 
 if __name__ == "__main__":
     latitude, longitude = 52.932476, -1.194917
-    radius_meters = 1
+    radius_km = 2
 
-    pubs = get_pubs(API_KEY, latitude, longitude, radius_meters)
+    pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
     routes = fetch_pub_routes(pubs)
 
     graph, pub_map = create_graph_from_routes(routes, pubs)

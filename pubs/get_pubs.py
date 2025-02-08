@@ -30,7 +30,7 @@ class PubData:
                 f"Website: {self.website}\n"
                 f"Photo Reference: {self.photo_reference if self.photo_reference else 'No Photos'}\n")
 
-def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int) -> list[PubData]:
+def get_pubs(api_key: str, latitude: float, longitude: float, radius_km: int) -> list[PubData]:
     """
     Fetches pubs from Google Places API using a search query and includes detailed information 
     from Contact and Atmosphere categories within a given radius.
@@ -82,7 +82,7 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
             photo_reference=photo_reference
         ))
     
-    pubs = filter_pubs_within_radius(pubs, latitude, longitude, radius_meters)
+    pubs = filter_pubs_within_radius(pubs, latitude, longitude, radius_km)
     return pubs
 
 def filter_pubs_within_radius(pubs: list, latitude: float, longitude: float, search_radius_km: float) -> list:
