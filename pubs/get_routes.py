@@ -7,6 +7,7 @@ from api_key import API_KEY
 from graph import UndirectedGraph
 from location import Location
 from visualise import visualize_graph
+from router import get_all_routes
 import re
 
 gmaps = googlemaps.Client(key=API_KEY)
@@ -132,5 +133,19 @@ if __name__ == "__main__":
     
     # Add shortest routes to connect disconnected components
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
-    
+
+    # Get all routes starting from each pub
+    routes_by_pub = get_all_routes(graph)
+
+    # Print out the routes for each starting pub
+    for start_pub, routes in routes_by_pub.items():
+        print(f"Routes starting from {start_pub}:")
+        for route in routes:
+            for n in route:
+                s_n = str(n)
+                print(" > " + s_n , end = "")
+            print("")
+
+
     visualize_graph(graph)
+
