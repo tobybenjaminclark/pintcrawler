@@ -15,7 +15,7 @@ gmaps = googlemaps.Client(key=API_KEY)
 
 MAX_PUBS = 6
 
-def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubData]:
+def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 5) -> list[PubData]:
     distances = [(geodesic((pub.latitude, pub.longitude), (other_pub.latitude, other_pub.longitude)).km, other_pub)
                  for other_pub in pubs if other_pub != pub]
     distances.sort(key=lambda x: x[0])
@@ -128,9 +128,9 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
 
 
 if __name__ == "__main__":
-    latitude, longitude = 53.758810, -2.707477
+    latitude, longitude = 52.953250, -1.150500
 
-    radius_km = 8
+    radius_km = 3
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
 
@@ -170,15 +170,17 @@ if __name__ == "__main__":
     print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
     print(best_node)
     for n in best_node:
-        print(" > " + str(n), end="")
+        print("\t> " + str(n), end="\n")
 
     print("\n\nWorst Route")
     print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
     print(worst_node)
     for n in worst_node:
-        print(" > " + str(n), end="")
+        print("\t> " + str(n), end="\n")
     print("")
     print("")
+
+
 
     visualize_graph(graph)
 
