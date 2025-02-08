@@ -28,14 +28,14 @@ const Map = () => {
         map.resize();
     })
     
-    map.on("click", (event) => {
+    /*map.on("click", (event) => {
         event.preventDefault();
         setCoordinates([event.lngLat.lng,event.lngLat.lat]);
         console.log([event.lngLat.lng,event.lngLat.lat]);
         console.log(coordinates);
         console.log("test");
 
-    })
+    })*/
 
     locations.forEach((location) => {
       new mapboxgl.Marker()
@@ -49,9 +49,9 @@ const Map = () => {
         setOptionVisible(!optionVisible);
     }
 
-    new mapboxgl.Marker()
-      .setLngLat([coordinates[0],coordinates[1]])
-      .addTo(map);
+    new mapboxgl.Marker({ color: "red" })
+    .setLngLat([coordinates[0], coordinates[1]])
+    .addTo(map);
 
 
     const handleKeyDown = (event) => {
