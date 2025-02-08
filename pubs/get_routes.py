@@ -9,6 +9,7 @@ from location import Location
 from visualise import visualize_graph
 from router import get_all_routes
 import re
+import math
 
 gmaps = googlemaps.Client(key=API_KEY)
 
@@ -138,18 +139,39 @@ if __name__ == "__main__":
     # Add shortest routes to connect disconnected components
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
-    """# Get all routes starting from each pub
+    # Get all routes starting from each pub
     routes_by_pub = get_all_routes(graph)
 
-    # Print out the routes for each starting pub
+    gl_routes = []
     for start_pub, routes in routes_by_pub.items():
-        print(f"Routes starting from {start_pub}:")
-        for route in routes:
-            for n in route:
-                s_n = str(n)
-                print(" > " + s_n , end = "")
-            print("")
-    """
+        for route, w in routes:
+            gl_routes.append((route, w))
+
+    best_node_w = -math.inf
+    worst_node_w = math.inf
+    best_node = None
+    worst_node = None
+
+    for _r, w in gl_routes:
+        if w > best_node_w:
+            best_node_w = w;
+            best_node = _r;
+        if w < worst_node_w:
+            worst_node_w = w;
+            worst_node = _r;
+
+    print("\n\nBest Route")
+    print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
+    print(best_node)
+    for n in best_node:
+        print(" > " + str(n), end="")
+
+    print("\n\nWorst Route")
+    print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
+    print(worst_node)
+    for n in worst_node:
+        print(" > " + str(n), end="")
+    print("")
 
     visualize_graph(graph)
 
