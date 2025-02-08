@@ -24,8 +24,8 @@ html, body, #root {
 
 /* If you need the h1 (or any interactive element) to handle pointer events, re-enable them */
 .overlay h1 {
-  pointer-events: auto;
+
   text-align: center;
   margin: 0px 0;
-  color: white; /* ensure contrast over the map */
+  color: rgb(0, 0, 0); /* ensure contrast over the map */
 }
