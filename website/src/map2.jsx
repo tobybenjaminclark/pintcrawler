@@ -1,65 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import 'mapbox-gl/dist/mapbox-gl.css';
+import "mapbox-gl/dist/mapbox-gl.css";
+import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
-// Import the images
-import roseAndCrownImg from './assets/rose-and-crown.png';
-import whiteHartImg from './assets/white-hart.png';
-import threeWheatsheavesImg from './assets/three-wheatsheaves.png';
+// Other imports...
+import roseAndCrownImg from "./assets/rose-and-crown.png";
+// ... other imports
 
-mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your token
+mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your Mapbox token
 
 const Map = () => {
   const mapContainerRef = useRef(null);
   const [coordinates, setCoordinates] = useState([-1.1815, 52.947]);
-  const [optionVisible, setOptionVisible] = useState(false);
 
-  // Define locations with images and names
   const locations = [
-    { 
-      name: "Rose & Crown", 
-      coords: [-1.1836073, 52.9476102], 
-      image: roseAndCrownImg 
-    },
-    { 
-      name: "The White Hart", 
-      coords: [-1.1793126, 52.9445159], 
-      image: whiteHartImg 
-    },
-    { 
-      name: "The Three Wheatsheaves", 
-      coords: [-1.1802778, 52.9488889], 
-      image: threeWheatsheavesImg 
-    }
-  ];
-
-  const routes = [
     {
-      start: "Rose & Crown",
-      end: "The Three Wheatsheaves",
-      route_coordinates: [
-        [-1.1833402, 52.9477021], [-1.1830892, 52.9477336],
-        [-1.182844, 52.9476144], [-1.1802856, 52.9485363],
-        [-1.1804342, 52.9488203]
-      ]
-    },
-    {
-      start: "Rose & Crown",
-      end: "The White Hart",
-      route_coordinates: [
-        [-1.1833402, 52.9477021], [-1.1830892, 52.9477336],
-        [-1.182844, 52.9476144], [-1.1834318, 52.9473358],
-        [-1.1807212, 52.9462673], [-1.1806955, 52.9453724],
-        [-1.1794838, 52.9454115], [-1.1794318, 52.944477]
-      ]
-    },
-    {
-      start: "The Three Wheatsheaves",
-      end: "The White Hart",
-      route_coordinates: [
-        [-1.1804342, 52.9488203], [-1.1802856, 52.9485363],
-        [-1.1794318, 52.944477]
-      ]
+      name: "Rose & Crown",
+      coords: [-1.1836073, 52.9476102],
+      image: roseAndCrownImg,
     }
   ];
 
@@ -71,7 +29,7 @@ const Map = () => {
       zoom: 15,
     });
 
-    map.on("load", () => {
+    map.on("load", async () => {
       map.resize();
       locations.forEach((location) => {
         const popupDiv = document.createElement("div");
@@ -99,28 +57,14 @@ const Map = () => {
           .addTo(map);
       });
 
-      routes.forEach((route, index) => {
-        map.addSource(`route-${index}`, {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "LineString",
-              coordinates: route.route_coordinates,
-            },
-          },
-        });
-
-        map.addLayer({
-          id: `route-${index}`,
-          type: "line",
-          source: `route-${index}`,
-          layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#ff0000", "line-width": 4 },
-        });
-      });
-    });
+      // Fetch and plot crimes on the map
+      const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
+      console.log("Fetched crimes:", crimes); 
+      if (crimes.length > 0) {
+          plotCrimes(map, crimes);
+      } else {
+          console.log("No crimes found at this location");
+    }});
 
     return () => map.remove();
   }, [coordinates]);
@@ -131,23 +75,31 @@ const Map = () => {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: "flex" }}>
       {/* Sidebar or Overlay */}
-      <div style={{ width: '250px', padding: '20px', background: '#f0f0f0', height: '100vh', overflowY: 'auto' }}>
+      <div
+        style={{
+          width: "250px",
+          padding: "20px",
+          background: "#f0f0f0",
+          height: "100vh",
+          overflowY: "auto",
+        }}
+      >
         <h2>Nearby Pubs</h2>
         {locations.map((location, index) => (
-          <div key={index} style={{ marginBottom: '15px' }}>
-            <button 
+          <div key={index} style={{ marginBottom: "15px" }}>
+            <button
               onClick={() => handlePubClick(location.coords)}
               style={{
-                width: '100%', 
-                padding: '10px', 
-                textAlign: 'left', 
-                backgroundColor: '#fff', 
-                border: '1px solid #ddd', 
-                borderRadius: '5px', 
-                cursor: 'pointer',
-                boxShadow: '2px 2px 5px rgba(0,0,0,0.1)'
+                width: "100%",
+                padding: "10px",
+                textAlign: "left",
+                backgroundColor: "#fff",
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                cursor: "pointer",
+                boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
               }}
             >
               {location.name}
@@ -157,7 +109,11 @@ const Map = () => {
       </div>
 
       {/* Map Container */}
-      <div ref={mapContainerRef} className="map-container" style={{ flex: 1, height: '100vh' }} />
+      <div
+        ref={mapContainerRef}
+        className="map-container"
+        style={{ flex: 1, height: "100vh" }}
+      />
     </div>
   );
 };
