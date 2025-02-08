@@ -2,7 +2,8 @@ import './App.css';
 import Map from "./map";
 import logo from "./assets/logo.png"
 
-function App() {
+const App = () => {
+  
   return (
     <>
       {/* Full-screen map container */}

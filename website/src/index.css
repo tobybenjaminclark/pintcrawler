@@ -66,6 +66,12 @@ button:focus-visible {
   margin-top: 0px;
 }
 
+.slider-container p {
+  color: black;
+  font-weight: bold; /* Optional: Makes text bold for better visibility */
+  margin-top: 0px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
