@@ -1,61 +1,105 @@
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import DistanceSlider from "./DistanceSlider.jsx"
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
 const Map = () => {
   const mapContainerRef = useRef(null);
+  const [coordinates, setCoordinates] = useState([-0.5658, 51.4258]);
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [overlayPosition, setOverlayPosition] = useState({ x: 0, y: 0 });
+  const [sliderValue, setSliderValue] = useState(25);
+  const [rating, setRating] = useState(-1);
+  const [walk, setWalk] = useState(-1);
+  const min = () => {
+    setRating(0);
+    }
+   const max = () => {
+    setRating(1);
+    }
+    const low = () => {
+        setWalk(0);
+        }
+    const medium = () => {
+        setWalk(1);
+        }
+    const high = () => {
+        setWalk(2);
+        }
+    const send = () => {
+        console.log("rating: ", rating);
+        console.log("distance: ",sliderValue)
+        console.log("walk: ",walk)
+    }
 
-  const [coordinates, setCoordinates] = useState([-0.5658080564214817,51.42583195427641]);
-  const [optionVisible, setOptionVisible] = useState([false]);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v11", // Change style as needed
-      center: [coordinates[0],coordinates[1]], // [lng, lat]
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: coordinates,
       zoom: 15,
     });
-    map.on("load", () => {
-        map.resize();
-    })
     
+    map.on("load", () => {
+      map.resize();
+    });
+
+    
+
     map.on("click", (event) => {
-        event.preventDefault();
-        
-        setCoordinates([event.lngLat.lng,event.lngLat.lat]);
-        console.log([event.lngLat.lng,event.lngLat.lat]);
-        console.log(coordinates);
-        console.log("test");
+      event.preventDefault();
+      const { lng, lat } = event.lngLat;
+      setCoordinates([lng, lat]);
 
-    })
+      // Get pixel position of click
+      const canvas = map.getCanvas();
+      const rect = canvas.getBoundingClientRect();
+      setOverlayVisible(true);
 
-    const toggleView = () => {
-        setOptionVisible(!optionVisible);
-    }
+      setOverlayVisible(true); // Show overlay
+    });
 
-    new mapboxgl.Marker()
-      .setLngLat([coordinates[0],coordinates[1]])
-      .addTo(map);
+    new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
-
-    const handleKeyDown = (event) => {
-        // Check if the spacebar (key code 32 or key ' ') is pressed
-        if (event.key === " ") {
-          setran("Spacebar was pressed!");
-          console.log(ran);
-          console.log("Spacebar was pressed!");
-        }
-      };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => map.remove(); // Cleanup on unmount
+    return () => map.remove();
   }, [coordinates]);
 
-  return( <div ref={mapContainerRef} className="map-container" />
+  return (
+    <div className="map-wrapper">
+      <div ref={mapContainerRef} className="map-container" />
 
-  )
+      {overlayVisible && (
+        <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
+          <button onClick={() => setOverlayVisible(false)}>Close</button>
+          <DistanceSlider min={0} max={50} step={0.1} onChange={setSliderValue} />
+          <div className="rating">
+            <button onClick={min}
+                style={{ backgroundColor: rating === 0 ? 'green' : '' }}>
+                 Minimum rating</button>
+            <button onClick={max}
+                style={{ backgroundColor: rating === 1 ? 'green' : '' }}>
+                Maximum rating</button>
+            </div>
+            <div className="rating">
+            <button onClick={low}
+                style={{ backgroundColor: walk === 0 ? 'green' : '' }}>
 
+                American</button>
+            <button onClick={medium}
+                style={{ backgroundColor: walk === 1 ? 'green' : '' }}>
+                British</button>
+                <button onClick={high}
+                style={{ backgroundColor: walk === 2 ? 'green' : '' }}>
+                Olimpean</button>
+            </div>
+          <button onClick={send}>Hunt</button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Map;
