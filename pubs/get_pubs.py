@@ -13,8 +13,8 @@ class PubData:
     source: str = "Google"
     distance_km: float = 0.0
     place_id: str = ""
-    rating: float = 0  # Default to 0 if no rating is available
-    user_ratings_total: int = 0  # Total number of ratings
+    rating: float = 0  
+    user_ratings_total: int = 0 
     phone_number: str = "Unknown Phone Number"
     website: str = "Unknown Website"
     photo_reference: str = "" 
@@ -50,7 +50,6 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
         address = place.get("vicinity", "Unknown Address")
         place_id = place.get("place_id", "")
         
-        # Fetch additional details for each pub using place_details
         place_details = gmaps.place(
             place_id=place_id,
             fields=["formatted_address", "formatted_phone_number", "international_phone_number", "opening_hours", 
@@ -86,7 +85,7 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_meters: int
 
 
 if __name__ == "__main__":
-    latitude, longitude = 51.5074, -0.1278  # London
+    latitude, longitude = 51.5074, -0.1278
     radius_meters = 2000  # 2km
 
     pubs = get_pubs(API_KEY, latitude, longitude, radius_meters)
