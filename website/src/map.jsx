@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// Note: You may need to update this path depending on how the build tool handles assets.
+import roseAndCrownImg from './assets/rose-and-crown.png';
+import whiteHartImg from './assets/white-hart.png';
+import threeWheatsheavesImg from './assets/three-wheatsheaves.png';
+
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
 const Map = () => {
@@ -10,9 +15,21 @@ const Map = () => {
   const [optionVisible, setOptionVisible] = useState(false);
 
   const locations = [
-    { name: "Rose & Crown", coords: [-1.1836073, 52.9476102] },
-    { name: "The White Hart", coords: [-1.1793126, 52.9445159] },
-    { name: "The Three Wheatsheaves", coords: [-1.1802778, 52.9488889] }
+    { 
+      name: "Rose & Crown", 
+      coords: [-1.1836073, 52.9476102], 
+      image: roseAndCrownImg 
+    },
+    { 
+      name: "The White Hart", 
+      coords: [-1.1793126, 52.9445159], 
+      image: whiteHartImg 
+    },
+    { 
+      name: "The Three Wheatsheaves", 
+      coords: [-1.1802778, 52.9488889], 
+      image: threeWheatsheavesImg 
+    }
   ];
 
   const routes = [
@@ -55,14 +72,32 @@ const Map = () => {
 
     map.on("load", () => {
       map.resize();
-      
+
       locations.forEach((location) => {
+        const popupDiv = document.createElement("div");
+        popupDiv.style.textAlign = "center";
+        popupDiv.style.maxWidth = "200px";
+
+        const title = document.createElement("h3");
+        title.textContent = location.name;
+        title.style.marginBottom = "5px";
+
+        const img = document.createElement("img");
+        img.src = location.image;
+        img.alt = location.name;
+        img.style.width = "100%";
+        img.style.height = "auto";
+        img.style.borderRadius = "5px";
+        img.style.boxShadow = "2px 2px 10px rgba(0,0,0,0.3)";
+
+        popupDiv.appendChild(title);
+        popupDiv.appendChild(img);
+
         new mapboxgl.Marker()
           .setLngLat(location.coords)
-          .setPopup(new mapboxgl.Popup().setText(location.name))
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setDOMContent(popupDiv))
           .addTo(map);
       });
-
 
       routes.forEach((route, index) => {
         map.addSource(`route-${index}`, {
@@ -87,14 +122,10 @@ const Map = () => {
       });
     });
 
-    const toggleView = () => {
-      setOptionVisible(!optionVisible);
-  }
-
     return () => map.remove();
   }, [coordinates]);
 
-  return <div ref={mapContainerRef} className="map-container"/>;
+  return <div ref={mapContainerRef} className="map-container" />;
 };
 
 export default Map;
