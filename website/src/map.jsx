@@ -17,17 +17,20 @@ const Map = () => {
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
   const [warriorMode, setWarriorMode] = useState(false);
-  const [lock, setLock] = useState(false);
-  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
-  const [title, setTitle] = useState("Weakling");
+  const [lock, setLock] = useState(true);
+  const [startPlaced, setStartPlaced] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for response
+  const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
+  const [title, setTitle] = useState("Weakling");
+  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
+
+  const startPlacedRef = useRef(false); // Use ref instead of state
 
   const min = () => setRating(0);
   const max = () => setRating(1);
   const low = () => setWalk(0);
   const medium = () => setWalk(1);
   const high = () => setWalk(2);
-
   const WarriorMode = () => {
     setWarriorMode(!warriorMode);
     if (!warriorMode) {
@@ -41,7 +44,9 @@ const Map = () => {
 
   const send = async () => {
     try {
+      setRouteGenerated(true);
       setLoading(true); // Set loading to true when awaiting the server response
+      setLock(false);
       console.log("test");
       console.log(coordinates);
   
@@ -53,8 +58,6 @@ const Map = () => {
   
       console.log("Push response:", response);
   
-      // Once the lock is set to false, mark the nodes and routes
-      setLock(false);
       setLoading(false); // Set loading to false once data is received
   
       // Ensure map is available from the mapRef
@@ -137,11 +140,6 @@ const Map = () => {
       zoom: 15,
     });
 
-    const handleKeyPress = (event) => {
-      if (event.key === 'r' || event.key === 'R') {
-        setLock(false);  // Unlock page
-      }
-    };
     // Store the map instance in the mapRef to make it accessible
     mapRef.current = map;
 
@@ -150,18 +148,30 @@ const Map = () => {
     });
 
     map.on("click", async (event) => {
-      if (lock) {
+      if (lock && !routeGenerated) {  // Check if route has not been generated
         event.preventDefault();
         const { lng, lat } = event.lngLat;
-        setCoordinates([lng, lat]);
 
+        console.log(startPlaced)
+    
+        if (!startPlacedRef.current) {  // Check ref value instead of state
+          startPlacedRef.current = true;  // Update the ref directly
+    
+          new mapboxgl.Marker({ color: 'black' })
+            .setLngLat([lng, lat])
+            .addTo(map);
+        }
+    
+    
+        // Optional: set the coordinates (if you still need them to update)
+        // setCoordinates([lng, lat]);
+    
+        // Get pixel position of click
         const canvas = map.getCanvas();
         const rect = canvas.getBoundingClientRect();
         setOverlayVisible(true);
       }
     });
-
-    new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
     return () => map.remove();
   }, [coordinates]);
@@ -170,7 +180,7 @@ const Map = () => {
     <div className="map-wrapper">
       <div ref={mapContainerRef} className="map-container" />
 
-      {overlayVisible && !lock && (
+      {overlayVisible && lock && (
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
           <div>
             Draft Your Desire
@@ -203,5 +213,4 @@ const Map = () => {
     </div>
   );
 };
-
 export default Map;
