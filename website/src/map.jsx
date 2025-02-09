@@ -20,14 +20,24 @@ const Map = () => {
   const [lock, setLock] = useState(true);
   const [loading, setLoading] = useState(false); // Loading state for response
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
-
+  const [title, setTitle] = useState("Weakling");
+  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
 
   const min = () => setRating(0);
   const max = () => setRating(1);
   const low = () => setWalk(0);
   const medium = () => setWalk(1);
   const high = () => setWalk(2);
-  const WarriorMode = () => setWarriorMode(!warriorMode);
+  const WarriorMode = () => {
+    setWarriorMode(!warriorMode);
+    if (!warriorMode) {
+      setDescription("The warrior wanders with immense power, prepared for any challenge that lies ahead!");
+      setTitle("A worthy One");
+    } else {
+      setDescription("A brave soul, lucky but special to dare walk the criminal lands");
+      setTitle("Weakling");
+    }
+  };
 
   const send = async () => {
     try {
@@ -118,31 +128,6 @@ const Map = () => {
     }
   };
   
-  const WarriorMode = () => {
-    setWarriorMode(!warriorMode);
-    if (!warriorMode) {
-      setDescription("The warrior wanders with immense power, prepared for any challenge that lies ahead!");
-      setTitle("A worthy One");
-    } else {
-      setDescription("A brave soul, lucky but special to dare walk the criminal lands");
-      setTitle("Weakling");
-    }
-  };
-
-  const send = async () => {
-    try {
-      setLock(true);  // Lock all interactions immediately
-      const data = [coordinates[0], coordinates[1], sliderValue, rating, walk, warriorMode];
-      console.log("Sending data:", data);
-
-      const response = await Push(data); 
-      console.log("Push response:", response);
-    } catch (error) {
-      console.error("Error in send function:", error);
-    } finally {
-      setLock(false); // Unlock page after sending data
-    }
-  };
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -154,11 +139,6 @@ const Map = () => {
 
     // Store the map instance in the mapRef to make it accessible
     mapRef.current = map;
-    const handleKeyPress = (event) => {
-      if (event.key === 'r' || event.key === 'R') {
-        setLock(false);  // Unlock page
-      }
-    };
 
     map.on("load", () => {
       map.resize();
@@ -169,20 +149,6 @@ const Map = () => {
         event.preventDefault();
         const { lng, lat } = event.lngLat;
         setCoordinates([lng, lat]);
-        
-    window.addEventListener('keydown', handleKeyPress);
-
-    map.on("click", (event) => {
-      if (!lock) {
-        event.preventDefault();
-        const { lng, lat } = event.lngLat;
-        setCoordinates([lng, lat]);
-
-        const canvas = map.getCanvas();
-        const rect = canvas.getBoundingClientRect();
-        setOverlayVisible(true);
-      }
-    });
 
         // Get pixel position of click
         const canvas = map.getCanvas();
@@ -198,7 +164,7 @@ const Map = () => {
     <div className="map-wrapper">
       <div ref={mapContainerRef} className="map-container" />
 
-      {overlayVisible && !lock && (
+      {overlayVisible && lock && (
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
           <div>
             Draft Your Desire
@@ -231,5 +197,4 @@ const Map = () => {
     </div>
   );
 };
-
 export default Map;
