@@ -3,9 +3,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
-// Other imports...
 import roseAndCrownImg from "./assets/rose-and-crown.png";
-// ... other imports
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your Mapbox token
 

@@ -14,7 +14,7 @@ const App = () => {
         <>
           {/* Full-screen map container */}
           <div className="map-container">
-            <Map />
+            <Map/>
           </div>
 
           {/* Overlay container for UI elements */}
