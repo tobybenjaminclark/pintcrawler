@@ -334,13 +334,15 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
                 start_pub = Pub(
                     name=best_node[i].name,
                     loc=(best_node[i].latitude, best_node[i].longitude),
-                    rating=best_node[i].attr.get("rating", 0)
+                    rating=best_node[i].attr.get("rating", 0),
+                    photo_reference =best_node[i].attr.get("photo_reference", "")
                 )
 
                 end_pub = Pub(
                     name=best_node[i + 1].name,
                     loc=(best_node[i + 1].latitude, best_node[i + 1].longitude),
-                    rating=best_node[i + 1].attr.get("rating", 0)
+                    rating=best_node[i + 1].attr.get("rating", 0),
+                    photo_reference =best_node[i+1].attr.get("photo_reference", "")
                 )
 
                 best_route_segments.append(Route(

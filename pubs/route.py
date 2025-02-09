@@ -5,6 +5,7 @@ class Pub:
     name: str
     loc: tuple[float, float]
     rating: int
+    photo_reference: str
 
 @dataclass
 class Route:
