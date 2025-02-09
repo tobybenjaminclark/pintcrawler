@@ -37,6 +37,7 @@ const Map = () => {
         console.log(
             Push(coordinates)
         );
+        map.remove()
         navigate('/Map2'); // Navigate to the new page
     }
 
@@ -70,7 +71,11 @@ const Map = () => {
 
     new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
-    return () => map.remove();
+    return () => {
+         // Cleanup: remove map and event listener on unmount
+      map.off(); // Remove click event listener
+      map.remove(); // Remove map instance
+    };
   }, [coordinates]);
 
   return (

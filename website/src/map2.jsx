@@ -5,31 +5,38 @@ import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
 import roseAndCrownImg from "./assets/rose-and-crown.png";
 
-mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your Mapbox token
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your Mapbox token
 
 const Map2 = () => {
-  const mapContainerRef = useRef(null);
-  const [coordinates, setCoordinates] = useState([-1.1815, 52.947]);
+  const MapContainerRef = useRef(null);
+  const [Coordinates, SetCoordinates] = useState([-1.1815, 52.947]);
 
   const locations = [
     {
       name: "Rose & Crown",
       coords: [-1.1836073, 52.9476102],
       image: roseAndCrownImg,
-    }
+    },
   ];
 
   useEffect(() => {
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
+    console.log("Initializing map...");
+
+    const map2 = new mapboxgl.Map({
+      container: MapContainerRef.current,
       style: "mapbox://styles/ezequielm/cij7hk832007dapktzdyaemih",
-      center: coordinates,
+      center: Coordinates,
       zoom: 15,
     });
 
-    map.on("load", async () => {
-      map.resize();
+    map2.on("load", async () => {
+      console.log("Map loaded successfully.");
+
+      map2.resize();
       locations.forEach((location) => {
+        console.log("Adding marker for:", location.name);
+
         const popupDiv = document.createElement("div");
         popupDiv.style.textAlign = "center";
         popupDiv.style.maxWidth = "200px";
@@ -52,24 +59,33 @@ const Map2 = () => {
         new mapboxgl.Marker()
           .setLngLat(location.coords)
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setDOMContent(popupDiv))
-          .addTo(map);
+          .addTo(map2);
       });
 
-      // Fetch and plot crimes on the map
-      const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
-      console.log("Fetched crimes:", crimes); 
-      if (crimes.length > 0) {
-          plotCrimes(map, crimes);
-      } else {
-          console.log("No crimes found at this location");
-    }});
+      console.log("Fetching crimes for coordinates:", Coordinates);
 
-    return () => map.remove();
-  }, [coordinates]);
+      // Fetch and plot crimes on the map
+      const crimes = await getCrimesByPoint(Coordinates[1], Coordinates[0]);
+      console.log("Fetched crimes:", crimes);
+
+      if (crimes.length > 0) {
+        console.log("Plotting crimes on the map...");
+        plotCrimes(map2, crimes);
+      } else {
+        console.log("No crimes found at this location");
+      }
+    });
+
+    return () => {
+      console.log("Removing map...");
+      map2.remove();
+    };
+  }, [Coordinates]);
 
   // Handle pub click to center map on the selected pub
   const handlePubClick = (coords) => {
-    setCoordinates(coords);
+    console.log("Pub clicked. Setting new coordinates:", coords);
+    SetCoordinates(coords);
   };
 
   return (
@@ -108,8 +124,8 @@ const Map2 = () => {
 
       {/* Map Container */}
       <div
-        ref={mapContainerRef}
-        className="map-container"
+        ref={MapContainerRef}
+        className="map-container2"
         style={{ flex: 1, height: "100vh" }}
       />
     </div>

@@ -24,7 +24,7 @@ const App = () => {
           </div>
         </>
       } />
-      <Route path="/Map2" element={<Map2 />} /> {/* New page route */}
+      <Route path="/Map2/" element={<Map2 />} /> {/* New page route */}
     </Routes>
   );
 }
