@@ -18,7 +18,7 @@ def hello_http():
     else:
         # Return an error response if required parameters are missing.
         return jsonify({"error": 100}), 400
-cors = CORS(app, allow_headers='*')
+
 if __name__ == '__main__':
     # Run the server in debug mode on host 0.0.0.0 and port 5000.
     app.run(debug=True, host='0.0.0.0', port=5069)
