@@ -61,7 +61,7 @@ button:before {
   left: 5px; 
   right: 5px;
   bottom: 5px;
-  background-color: #ffffff; /* Grey border area */
+  background-color: #B69779; /* Grey border area */
   z-index: -1;
   border-radius: 0px;
 
@@ -135,7 +135,6 @@ button:focus-visible {
 
 
 .special-button {
-  position: absolute;
   background-color: #00ff3c; /* Solid green background */
   border: none; /* Remove any borders */
   font-size: 24px; /* Text size */
@@ -144,10 +143,9 @@ button:focus-visible {
   border-radius: 10px; /* Rounded corners for a clean look */
   padding: 10px 20px; /* Padding to ensure the button has size */
   transition: background-color 0.3s ease; /* Smooth background color transition */
-  width: auto; /* Ensure the button width adjusts based on content */
-  height: auto; /* Ensure the height is based on the content */
   display: inline-block; /* Adjust button layout */
   box-sizing: border-box; /* Ensure padding is included in the button's dimensions */
+  margin-left: 10px; /* Space between the text and button */
 }
 
 .special-button:hover {
