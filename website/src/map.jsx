@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DistanceSlider from "./DistanceSlider.jsx";
 import { Push } from "./link.jsx";
+
 import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
@@ -72,45 +73,69 @@ const Map = () => {
   
       // Iterate through each route object in the response.data
       if (response && response.data && Array.isArray(response.data)) {
-        response.data.forEach((routeData, index) => {  // Add index parameter
+        response.data.forEach(async (routeData, index) => {  // Add index parameter
           // Add marker for start node using node.loc
           if (routeData.start_node && Array.isArray(routeData.start_node.loc)) {
             const [lat, lng] = routeData.start_node.loc;
+  
+            // Create a popup content with text and image
+            let popupContent = `<div style="text-align: center;">
+              <p>${routeData.start_node.name}</p>`;
+  
+            // Fetch photo reference if available and add it to popup
+            if (routeData.start_node.photo_reference) {
+              const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${routeData.start_node.photo_reference}&key=AIzaSyD2-qiQoW3Qd6-ToCN9gAmW6e2RqSwJYsk`;
+  
+              popupContent += `<img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0;"/>`;
+            }
+  
+            popupContent += `</div>`;
+  
             const marker = new mapboxgl.Marker()
               .setLngLat([lng, lat])
-              .addTo(map)
-              .getElement().addEventListener("click", (event) => {
-                // Calculate the pixel position for the overlay
-                const canvas = map.getCanvas();
-                const { x, y } = map.project([lng, lat]);
-                
-                // Update overlay content and position
-                setMarkerInfoContent(`${routeData.start_node.name}: [${lat}, ${lng}]`);
-                setMarkerInfoPosition({ x, y });
-                setMarkerInfoVisible(true);
-              });
+              .addTo(map);
+  
+            // Create a popup for the marker
+            const popup = new mapboxgl.Popup({ offset: 25 })
+              .setLngLat([lng, lat])
+              .setHTML(popupContent);
+  
+            marker.setPopup(popup); // Attach the popup to the marker
+  
             markersRef.current.push(marker);  // Store marker in the ref
           }
-
+  
           // Add marker for end node using node.loc
           if (routeData.end_node && Array.isArray(routeData.end_node.loc)) {
             const [lat, lng] = routeData.end_node.loc;
+  
+            // Create a popup content with text and image
+            let popupContent = `<div style="text-align: center;">
+              <p>${routeData.end_node.name}</p>`;
+  
+            // Fetch photo reference if available and add it to popup
+            if (routeData.end_node.photo_reference) {
+              const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${routeData.end_node.photo_reference}&key=AIzaSyD2-qiQoW3Qd6-ToCN9gAmW6e2RqSwJYsk`;
+  
+              popupContent += `<img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0;"/>`;
+            }
+  
+            popupContent += `</div>`;
+  
             const marker = new mapboxgl.Marker()
               .setLngLat([lng, lat])
-              .addTo(map)
-              .getElement().addEventListener("click", (event) => {
-                // Calculate the pixel position for the overlay
-                const canvas = map.getCanvas();
-                const { x, y } = map.project([lng, lat]);
-                
-                // Update overlay content and position
-                setMarkerInfoContent(`${routeData.end_node.name}: [${lat}, ${lng}]`);
-                setMarkerInfoPosition({ x, y });
-                setMarkerInfoVisible(true);
-              });
+              .addTo(map);
+  
+            // Create a popup for the marker
+            const popup = new mapboxgl.Popup({ offset: 25 })
+              .setLngLat([lng, lat])
+              .setHTML(popupContent);
+  
+            marker.setPopup(popup); // Attach the popup to the marker
+  
             markersRef.current.push(marker);  // Store marker in the ref
           }
-
+  
           // Add routes between nodes in the response
           if (routeData.route && Array.isArray(routeData.route)) {
             const routeCoordinates = routeData.route.map((point) => {
@@ -120,8 +145,8 @@ const Map = () => {
               }
               return [];
             }).filter(coord => coord.length > 0); // Ensure valid coordinates
-
-
+  
+  
             // Add route layer with a unique ID based on the index
             map.addSource(`route-${index}`, {
               type: "geojson",
@@ -145,20 +170,22 @@ const Map = () => {
           }
         });
       }
+  
       // Fetch and plot crimes on the map
-    const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
-    console.log("Fetched crimes:", crimes); 
-    if (crimes.length > 0) {
+      const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
+      console.log("Fetched crimes:", crimes);
+      if (crimes.length > 0) {
         plotCrimes(map, crimes);
-    } else {
-          console.log("No crimes found at this location");
-    };
+      } else {
+        console.log("No crimes found at this location");
+      };
   
     } catch (error) {
       console.error("Error in send function:", error);
       setLoading(false); // Ensure loading is false in case of an error
     }
   };
+  
   
 
   useEffect(() => {
