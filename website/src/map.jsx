@@ -14,8 +14,8 @@ const Map = () => {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayPosition, setOverlayPosition] = useState({ x: -100, y: -200 });
   const [sliderValue, setSliderValue] = useState(2.5);
-  const [rating, setRating] = useState(-1);
-  const [walk, setWalk] = useState(-1);
+  const [rating, setRating] = useState(0);
+  const [walk, setWalk] = useState(0);
   const [warriorMode, setWarriorMode] = useState(false);
   const [lock, setLock] = useState(true);
   const [startPlaced, setStartPlaced] = useState(false);
@@ -182,28 +182,42 @@ const Map = () => {
 
       {overlayVisible && lock && (
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
-          <div>
-            Draft Your Desire
-            <button className="close-button" onClick={() => setOverlayVisible(false)}>X</button>
-          </div>
-          taverns territory
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <p style={{ fontSize: 35, margin: 0 }}>Draft your desire</p>
+  <button className="close-button" onClick={() => setOverlayVisible(false)} style={{ border: 'none', background: 'none', fontSize: '25px', cursor: 'pointer' }}>
+    X
+  </button>
+</div>
+          <p style={{ fontSize: 25 }}>taverns territory</p>
           <DistanceSlider min={0} max={5} step={0.1} onChange={setSliderValue} />
-          Merit of the mead
+          <p style={{ fontSize: 25 }}>Merit of the mead</p>
           <div className="rating">
             <button onClick={min} style={{ backgroundColor: rating === 0 ? '#a4764a' : '' }}>Bottom of Barrel</button>
             <button onClick={max} style={{ backgroundColor: rating === 1 ? '#d4af37' : '' }}>High of Hops</button>
           </div>
-          Will to Wander
+          <p style={{ fontSize: 25 }}>Will to Wander</p>
           <div className="rating">
             <button onClick={low} style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>American</button>
             <button onClick={medium} style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>British</button>
             <button onClick={high} style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>Olympian</button>
           </div>
           <p style={{ fontSize: 25 }}>{title}</p>
-          <div className="warrior" style={{ display: 'flex', alignItems: 'center' }}>
-            <p1 style={{ marginRight: '10px' }}>{description}</p1>
-            <button onClick={WarriorMode} className="special-button" style={{ backgroundColor: warriorMode === true ? '#F00707FF' : '', color: warriorMode ? 'black' : '', border: 'none' }}></button>
-          </div>
+          <div className="warrior" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+  <p1 style={{ marginRight: '10px', flex: 1 }}>{description}</p1>
+  <button 
+    onClick={WarriorMode} 
+    className="special-button"
+    style={{
+      backgroundColor: warriorMode ? "#F00707FF" : "#1A244DFF", // Red when warriorMode is on
+      color: warriorMode ? "black" : "",
+      border: "none"
+    }}
+    
+  >
+    {/* Button content */}
+  </button>
+</div>
+
           <div>
             Signed
             <button onClick={send}>..............</button>
