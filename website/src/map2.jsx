@@ -9,7 +9,7 @@ import roseAndCrownImg from "./assets/rose-and-crown.png";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYXN3YXJicyIsImEiOiJjbTZ3aGltOTkwZnJxMmlxcTRtemc3aGluIn0.rNpbfxFKGne1I1b6s8uQRQ"; // Replace with your Mapbox token
 
-const Map = () => {
+const Map2 = () => {
   const mapContainerRef = useRef(null);
   const [coordinates, setCoordinates] = useState([-1.1815, 52.947]);
 
@@ -118,4 +118,4 @@ const Map = () => {
   );
 };
 
-export default Map;
+export default Map2;

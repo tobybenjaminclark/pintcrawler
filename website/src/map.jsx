@@ -3,10 +3,12 @@ import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DistanceSlider from "./DistanceSlider.jsx";
 import {Push} from "./link.jsx";
+import { useNavigate } from 'react-router-dom';
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
 const Map = () => {
+  const navigate = useNavigate();
   const mapContainerRef = useRef(null);
   const [coordinates, setCoordinates] = useState([-0.5658, 51.4258]);
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -35,6 +37,7 @@ const Map = () => {
         console.log(
             Push(coordinates)
         );
+        navigate('/Map2'); // Navigate to the new page
     }
 
 
