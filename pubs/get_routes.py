@@ -141,6 +141,7 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
                 dfs(neighbor[0], visited)
 
     visited = set()
+    print(graph.vertices())
     starting_vertex = graph.vertices()[0]
     dfs(starting_vertex, visited)
     for pub in pubs:
@@ -168,12 +169,16 @@ def main_router(lat, long) -> list[Route]:
     The function returns the list of Route objects for the best route.
     """
     # Get pubs and build graph
-    latitude, longitude = lat, long
+    longitude, latitude  = lat, long
     radius_km = 8
+    print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
     pubs = normalize_pub_ratings(pubs)
+    print(pubs)
     routes = fetch_pub_routes(pubs)
+    print(routes)
     graph, pub_map = create_graph_from_routes(routes, pubs)
+    print(graph, pub_map)
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
     # Get all routes from the graph (each route is a list of vertices with a weight)

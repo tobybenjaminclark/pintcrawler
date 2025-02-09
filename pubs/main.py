@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-@app.route('/', methods=['OPTIONS'])
+@app.route('/', methods=['POST'])
 def hello_http():
     """
     Endpoint that mimics the behavior of your Cloud Function.
@@ -14,7 +14,7 @@ def hello_http():
     request_json = request.get_json(silent=True)
     print("testingggfdasfsaf")
     if request_json and "lat" in request_json and "long" in request_json:
-        print("test")
+        print(request_json)
         # Call your main_router function with the provided latitude and longitude.
         result = main_router(request_json["lat"], request_json["long"])
         return jsonify(result)
