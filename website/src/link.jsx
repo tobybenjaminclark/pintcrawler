@@ -31,7 +31,7 @@ export function Pull(address) {
  */
 export function Push(input) {
 
-  const requestData = { lat: input[1], long: input[0], maximise_rating: input[3],walking: input[4],range: input[2]}; //slidervalue,rating,walk
+  const requestData = { lat: input[1], long: input[0], maximise_rating: input[3],walking: input[4],range: input[2],warrior_mode: input[5]}; //slidervalue,rating,walk
 
   console.log('Sending request:', {
     method: 'post',

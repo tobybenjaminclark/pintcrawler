@@ -14,7 +14,7 @@ const Map = () => {
   const [sliderValue, setSliderValue] = useState(2.5);
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
-  const [warriorMode, setWarriorMode] = useState(0);
+  const [warriorMode, setWarriorMode] = useState(false);
   const min = () => {
     setRating(0);
     }
@@ -30,10 +30,13 @@ const Map = () => {
     const high = () => {
         setWalk(2);
         }
+    const WarriorMode = () => {
+        setWarriorMode(!warriorMode);
+    }
     const send = () => {
         console.log("test");
         console.log(coordinates);
-        const data = [coordinates[0],coordinates[1],sliderValue,rating,walk]
+        const data = [coordinates[0],coordinates[1],sliderValue,rating,walk,warriorMode]
         console.log(
             Push(data)
         );
@@ -108,6 +111,12 @@ const Map = () => {
                 <button onClick={high}
                 style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>
                 Olimpean</button>
+            </div>
+            <div className="warrior">
+                "Warrior Mode"
+                <button onClick={WarriorMode}
+                style={{ backgroundColor: warriorMode === true ? '#F00707FF' : '' }}>
+                </button>
             </div>
             <div>
                 Signed
