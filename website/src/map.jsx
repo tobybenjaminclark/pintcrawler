@@ -23,6 +23,13 @@ const Map = () => {
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
   const [title, setTitle] = useState("Weakling");
   const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
+  const markersRef = useRef([]); // Store markers to manage them
+
+  const [markerInfoVisible, setMarkerInfoVisible] = useState(false);
+  const [markerInfoContent, setMarkerInfoContent] = useState("");  // Store content for the marker info overlay
+  const [markerInfoPosition, setMarkerInfoPosition] = useState({ x: 0, y: 0 });  // Store position of the marker info overlay
+
+  
 
   const startPlacedRef = useRef(false); // Use ref instead of state
 
@@ -69,19 +76,41 @@ const Map = () => {
           // Add marker for start node using node.loc
           if (routeData.start_node && Array.isArray(routeData.start_node.loc)) {
             const [lat, lng] = routeData.start_node.loc;
-            new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker()
               .setLngLat([lng, lat])
-              .addTo(map);
+              .addTo(map)
+              .getElement().addEventListener("click", (event) => {
+                // Calculate the pixel position for the overlay
+                const canvas = map.getCanvas();
+                const { x, y } = map.project([lng, lat]);
+                
+                // Update overlay content and position
+                setMarkerInfoContent(`${routeData.start_node.name}: [${lat}, ${lng}]`);
+                setMarkerInfoPosition({ x, y });
+                setMarkerInfoVisible(true);
+              });
+            markersRef.current.push(marker);  // Store marker in the ref
           }
-  
+
           // Add marker for end node using node.loc
           if (routeData.end_node && Array.isArray(routeData.end_node.loc)) {
             const [lat, lng] = routeData.end_node.loc;
-            new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker()
               .setLngLat([lng, lat])
-              .addTo(map);
+              .addTo(map)
+              .getElement().addEventListener("click", (event) => {
+                // Calculate the pixel position for the overlay
+                const canvas = map.getCanvas();
+                const { x, y } = map.project([lng, lat]);
+                
+                // Update overlay content and position
+                setMarkerInfoContent(`${routeData.end_node.name}: [${lat}, ${lng}]`);
+                setMarkerInfoPosition({ x, y });
+                setMarkerInfoVisible(true);
+              });
+            markersRef.current.push(marker);  // Store marker in the ref
           }
-  
+
           // Add routes between nodes in the response
           if (routeData.route && Array.isArray(routeData.route)) {
             const routeCoordinates = routeData.route.map((point) => {
@@ -179,6 +208,24 @@ const Map = () => {
   return (
     <div className="map-wrapper">
       <div ref={mapContainerRef} className="map-container" />
+
+      {markerInfoVisible && (
+        <div
+          className="marker-overlay"
+          style={{
+            position: "absolute",
+            top: markerInfoPosition.y - 40, // Position overlay slightly above marker
+            left: markerInfoPosition.x - 20, // Center horizontally above marker
+            backgroundColor: "white",
+            padding: "10px",
+            borderRadius: "5px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+            zIndex: 10,
+          }}
+        >
+          {markerInfoContent}
+        </div>
+      )}
 
       {overlayVisible && lock && (
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
