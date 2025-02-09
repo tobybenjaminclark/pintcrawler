@@ -161,7 +161,7 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
     return graph
 
 
-def main_router(lat, long) -> list[Route]:
+def main_router(lat, long, show = False) -> list[Route]:
     """
     Main routine: fetch pubs, build the route graph, select the best route,
     and then for each consecutive pair of pubs in the best route, call the directions API
@@ -169,7 +169,7 @@ def main_router(lat, long) -> list[Route]:
     The function returns the list of Route objects for the best route.
     """
     # Get pubs and build graph
-    longitude, latitude  = lat, long
+    longitude, latitude  = long, lat
     radius_km = 8
     print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
@@ -241,7 +241,8 @@ def main_router(lat, long) -> list[Route]:
                 ))
 
     # Optionally, visualize the graph.
-    #visualize_graph(graph)
+    if show:
+        visualize_graph(graph)
 
     return best_route_segments
 
