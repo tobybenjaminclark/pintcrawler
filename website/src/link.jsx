@@ -1,4 +1,4 @@
-import axios from 'axios';
+//import axios from 'axios';
 
 /**
  * Method used to pull data from the backend DB.
@@ -29,29 +29,28 @@ export function Pull(address) {
  * @param {*} address Address data should be written to.
  * @param {*} input Data to be written to backend.
  */
+import axios from 'axios';
+
 export function Push(input) {
+    const requestData = { 
+      lat: input[1], 
+      long: input[0], 
+      maximise_rating: input[3], 
+      walking: input[4], 
+      range: input[2], 
+      warrior_mode: input[5]
+    };
 
-  const requestData = { lat: input[1], long: input[0], maximise_rating: input[3],walking: input[4],range: input[2],warrior_mode: input[5]}; //slidervalue,rating,walk
+    console.log('Sending request:', {
+      method: 'post',
+      url: 'http://localhost:5069/',
+      data: requestData
+    });
 
-  console.log('Sending request:', {
-    method: 'post',
-    url: 'http://localhost:5069/',
-    data: requestData
-  });
-  axios({
-    method: 'post',
-    url: 'http://localhost:5069/',
-    data: requestData,
-    
-    
-  })
-  .then((response) => {
-    console.log(response.data);
-    
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-
-  
+    // Return the axios promise to allow the caller to await it
+    return axios({
+      method: 'post',
+      url: 'http://localhost:5069/',
+      data: requestData
+    });
 }
