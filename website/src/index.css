@@ -44,7 +44,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #777676; /* White center */
+  background-color: #6A4E3C; /* White center */
   color: #000000; /* Black text */
   cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
@@ -54,7 +54,7 @@ button {
   
 }
 
-button::before {
+button:before {
   content: '';
   position: absolute;
   top: 5px; 
@@ -100,7 +100,7 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #a18c8c;
+    background-color: #f30000;
   }
 }
 
@@ -130,4 +130,43 @@ button:focus-visible {
 }
 .close-button:focus {
   outline: none; /* Removes the focus outline when clicked */
+}
+
+
+
+.special-button {
+  position: absolute;
+  background-color: #00ff3c; /* Solid green background */
+  border: none; /* Remove any borders */
+  font-size: 24px; /* Text size */
+  color: white; /* Text color */
+  cursor: pointer;
+  border-radius: 10px; /* Rounded corners for a clean look */
+  padding: 10px 20px; /* Padding to ensure the button has size */
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+  width: auto; /* Ensure the button width adjusts based on content */
+  height: auto; /* Ensure the height is based on the content */
+  display: inline-block; /* Adjust button layout */
+  box-sizing: border-box; /* Ensure padding is included in the button's dimensions */
+}
+
+.special-button:hover {
+  background-color: #009c28; /* Darken the button color on hover */
+}
+
+.special-button:focus {
+  outline: none; /* Remove focus outline */
+}
+
+.special-button:before {
+  content: '';
+  position: absolute;
+  top: 5px; 
+  left: 5px; 
+  right: 5px;
+  bottom: 5px;
+  background-color: #ffffff00; /* Grey border area */
+  z-index: -1;
+  border-radius: 0px;
+
 }

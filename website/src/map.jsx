@@ -10,7 +10,7 @@ const Map = () => {
   const mapContainerRef = useRef(null);
   const [coordinates, setCoordinates] = useState([-0.5658, 51.4258]);
   const [overlayVisible, setOverlayVisible] = useState(false);
-  const [overlayPosition, setOverlayPosition] = useState({ x: 0, y: 0 });
+  const [overlayPosition, setOverlayPosition] = useState({ x: -100, y: -200 });
   const [sliderValue, setSliderValue] = useState(2.5);
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
@@ -79,9 +79,9 @@ const Map = () => {
     <div className="map-wrapper">
       <div ref={mapContainerRef} className="map-container" />
 
-      {overlayVisible && (
+      {overlayVisible && ( 
         
-        <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
+        <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x} }>
             
             <div>
             Draft Your Desire   
@@ -106,16 +106,23 @@ const Map = () => {
 
                 American</button>
             <button onClick={medium}
-                style={{ backgroundColor: walk === 1 ? '#a4764a' : '' }}>
+                style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>
                 British</button>
                 <button onClick={high}
                 style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>
                 Olimpean</button>
             </div>
+            <p>Warrior mode</p>
+            "Warrior Mode"
+            
             <div className="warrior">
-                "Warrior Mode"
+            <p1>A brave soul, lucky but speical to dare walk the criminal lands</p1>
                 <button onClick={WarriorMode}
-                style={{ backgroundColor: warriorMode === true ? '#F00707FF' : '' }}>
+                className = "special-button"
+                style={{ 
+                    backgroundColor: warriorMode === true ? '#F00707FF' : '',
+                    color: warriorMode ? 'black' : '',
+                    border: 'none' }}>
                 </button>
             </div>
             <div>
