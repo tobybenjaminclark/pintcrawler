@@ -19,6 +19,8 @@ const Map = () => {
   const [warriorMode, setWarriorMode] = useState(false);
   const [lock, setLock] = useState(true);
   const [loading, setLoading] = useState(false); // Loading state for response
+  const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
+
 
   const min = () => setRating(0);
   const max = () => setRating(1);
@@ -29,7 +31,9 @@ const Map = () => {
 
   const send = async () => {
     try {
+      setRouteGenerated(true);
       setLoading(true); // Set loading to true when awaiting the server response
+      setLock(false);
       console.log("test");
       console.log(coordinates);
   
@@ -41,8 +45,6 @@ const Map = () => {
   
       console.log("Push response:", response);
   
-      // Once the lock is set to false, mark the nodes and routes
-      setLock(false);
       setLoading(false); // Set loading to false once data is received
   
       // Ensure map is available from the mapRef
@@ -133,7 +135,7 @@ const Map = () => {
     });
 
     map.on("click", async (event) => {
-      if (lock) {
+      if (lock && setLock) {
         event.preventDefault();
         const { lng, lat } = event.lngLat;
         setCoordinates([lng, lat]);
@@ -144,8 +146,6 @@ const Map = () => {
         setOverlayVisible(true);
       }
     });
-
-    new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
     return () => map.remove();
   }, [coordinates]);
