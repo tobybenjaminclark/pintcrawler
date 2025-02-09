@@ -35,6 +35,12 @@ def get_vertex_weight(current: Location) -> float:
         return current.attr["rating"]
 
 
+import math
+
+# Add a constant for the maximum allowed turning angle (in radians).
+# (Adjust the threshold as desired—here 150° is used.)
+ANGLE_THRESHOLD = math.radians(150)
+
 def get_all_routes_from_vertex(graph, start):
     """
     Given an undirected graph and a starting vertex,
@@ -44,7 +50,6 @@ def get_all_routes_from_vertex(graph, start):
       - route: list of vertices
       - weight: the total weight of the route
     """
-
     def dfs(current, path, current_weight=0.0):
         routes = []
         path_length = len(path)
@@ -53,19 +58,42 @@ def get_all_routes_from_vertex(graph, start):
         if 3 <= path_length <= 5:
             routes.append((path, current_weight))
 
-        # If we have reached 5 pubs, do not extend further.
+        # Do not extend beyond 5 pubs.
         if path_length == 5:
             return routes
 
         # Try extending the path.
         for neighbor, edge_cost in graph.get_neighbors(current):
             if neighbor not in path:
-                # Update the weight: subtract the edge cost (scaled) and add the current vertex's weight.
+                # If we already have at least two pubs, check the turning angle.
+                if len(path) >= 2:
+                    A = path[-2]      # previous pub
+                    B = current       # current pub
+                    C = neighbor      # candidate next pub
+                    # Compute the two vectors:
+                    # Vector from A to B
+                    v = (B.latitude - A.latitude, B.longitude - A.longitude)
+                    # Vector from B to C
+                    w = (C.latitude - B.latitude, C.longitude - B.longitude)
+                    norm_v = math.sqrt(v[0] ** 2 + v[1] ** 2)
+                    norm_w = math.sqrt(w[0] ** 2 + w[1] ** 2)
+                    # Only check the angle if both vectors are nonzero
+                    if norm_v > 0 and norm_w > 0:
+                        dot = v[0] * w[0] + v[1] * w[1]
+                        # Clamp the cosine to the valid range [-1, 1] to avoid numerical errors.
+                        cos_angle = max(-1, min(1, dot / (norm_v * norm_w)))
+                        angle = math.acos(cos_angle)
+                        # If the turning angle is greater than the threshold, skip this neighbor.
+                        if angle > ANGLE_THRESHOLD:
+                            continue
+
+                # Update the weight and continue the DFS.
                 new_weight = current_weight - (edge_cost * EDGE_WEIGHT) + get_vertex_weight(current)
                 routes.extend(dfs(neighbor, path + [neighbor], new_weight))
         return routes
 
     return dfs(start, [start])
+
 
 
 def get_all_routes(graph):
