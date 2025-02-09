@@ -39,8 +39,8 @@ const Map = () => {
   const [startPlaced, setStartPlaced] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for response
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
-  const [title, setTitle] = useState("Weakling");
-  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
+  const [title, setTitle] = useState("Path of the Peacekeeper");
+  const [description, setDescription] = useState("Evade Conflict on your path to draughts transcendence.");
   const markersRef = useRef([]); // Store markers to manage them
   const coordinatesRef = useRef([-0.5658, 51.4258]); // Store markers to manage them
 
@@ -60,13 +60,13 @@ const Map = () => {
   const WarriorMode = () => {
     setWarriorMode(!warriorMode);
     if (!warriorMode) {
-      setDescription("The warrior wanders with immense power, prepared for any challenge that lies ahead!");
-      setTitle("A worthy One");
+      setDescription("Fight through land filled with thieves, turmoil, and discord.");
+      setTitle("The Warriors Walk");
     } else {
-      setDescription("A brave soul, lucky but special to dare walk the criminal lands");
-      setTitle("Weakling");
+      setDescription("Evade Conflict on your path to draughts transcendence.");
+      setTitle("Path of the Peacekeeper");
     }
-  };
+  };    
 
   const send = async () => {
     try {

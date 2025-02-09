@@ -55,11 +55,11 @@ def get_all_routes_from_vertex(graph, start):
         path_length = len(path)
 
         # If the path has between 3 and 5 vertices, record it.
-        if 3 <= path_length <= 5:
+        if 4 <= path_length <= 10:
             routes.append((path, current_weight))
 
         # Do not extend beyond 5 pubs.
-        if path_length == 5:
+        if path_length == 10:
             return routes
 
         # Try extending the path.
