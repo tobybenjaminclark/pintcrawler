@@ -100,7 +100,7 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f30000;
+    background-color: #cdbb9e;
   }
 }
 
@@ -176,8 +176,8 @@ button:focus-visible {
 }
 
 .map-overlay .rating {
-  margin-top: 0px; /* Reduce top margin for rating buttons */
-  margin-bottom: 0px; /* Reduce bottom margin for rating buttons */
+  margin-top: 5px; /* Reduce top margin for rating buttons */
+  margin-bottom: 5px; /* Reduce bottom margin for rating buttons */
 }
 
 .distance-slider {
@@ -220,4 +220,15 @@ input[type="range"]::-moz-range-thumb {
   background: #000000; /* Thumb color */
   border-radius: 50%; /* Make the thumb circular */
   cursor: pointer; /* Change cursor when hovering over the thumb */
+}
+
+.signed-text {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.signed-text:hover {
+  color: red;
 }
