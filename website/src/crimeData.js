@@ -61,11 +61,16 @@ export const plotCrimes = (map, crimes) => {
     const coordinates = e.features[0].geometry.coordinates.slice();
     const category = e.features[0].properties.category;
 
-    // Ensure the popup is centered on the clicked marker
     new mapboxgl.Popup()
-      .setLngLat(coordinates)
-      .setHTML(`<strong>Crime Category: </strong>${category}`)
-      .addTo(map);
+    .setLngLat(coordinates)
+    .setHTML(`
+      <div style="text-align: center; background-color: #B5AE90; border: 2px solid black; padding: 10px;">
+        <p style="font-size: 20px; font-family: 'medieval', sans-serif; color: #000000;">
+          <strong>Crime Category: </strong>${category}
+        </p>
+      </div>
+    `)
+    .addTo(map);
   });
 
   // Change the cursor to a pointer when hovering over a crime marker
