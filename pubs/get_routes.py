@@ -168,17 +168,16 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     to retrieve (and decode) the polyline. For each segment a Route object is created.
     The function returns the list of Route objects for the best route.
     """
+
     # Get pubs and build graph
     longitude, latitude  = long, lat
     radius_km = 8
     print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
     pubs = normalize_pub_ratings(pubs)
-    print(pubs)
+
     routes = fetch_pub_routes(pubs)
-    print(routes)
     graph, pub_map = create_graph_from_routes(routes, pubs)
-    print(graph, pub_map)
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
     # Get all routes from the graph (each route is a list of vertices with a weight)

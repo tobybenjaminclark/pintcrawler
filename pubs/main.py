@@ -10,7 +10,6 @@ def hello_http():
     Endpoint that mimics the behavior of your Cloud Function.
     Expects a JSON payload with "lat" and "long" keys.
     """
-    print("testinggg")
     request_json = request.get_json(silent=True)
 
     required_params = [
