@@ -200,9 +200,9 @@ const Map = () => {
           </div>
           <p style={{ fontSize: 25 }}>Will to Wander</p>
           <div className="rating">
-            <button onClick={low} style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>American</button>
-            <button onClick={medium} style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>British</button>
-            <button onClick={high} style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>Olympian</button>
+            <button onClick={low} style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>Peasant</button>
+            <button onClick={medium} style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>Knight</button>
+            <button onClick={high} style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>Nomad</button>
           </div>
           <p style={{ fontSize: 25 }}>{title}</p>
           <div className="warrior" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
