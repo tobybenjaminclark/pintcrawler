@@ -82,7 +82,7 @@ const Map = () => {
             
             <div>
             Draft Your Desire   
-            <button class="close-button" onClick={() => setOverlayVisible(false)}>X</button>    
+            <button className="close-button" onClick={() => setOverlayVisible(false)}>X</button>    
           
           </div>
           taverns territory
