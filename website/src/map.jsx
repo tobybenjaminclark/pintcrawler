@@ -18,10 +18,13 @@ const Map = () => {
   const [walk, setWalk] = useState(-1);
   const [warriorMode, setWarriorMode] = useState(false);
   const [lock, setLock] = useState(true);
+  const [startPlaced, setStartPlaced] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for response
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
   const [title, setTitle] = useState("Weakling");
   const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
+
+  const startPlacedRef = useRef(false); // Use ref instead of state
 
   const min = () => setRating(0);
   const max = () => setRating(1);
@@ -145,18 +148,24 @@ const Map = () => {
     });
 
     map.on("click", async (event) => {
-      if (lock && setLock) {
-        
+      if (lock && !routeGenerated) {  // Check if route has not been generated
         event.preventDefault();
         const { lng, lat } = event.lngLat;
 
-        // Place the marker on the map at the clicked location
-        new mapboxgl.Marker({color: 'black'})
-        .setLngLat([lng, lat])
-        .addTo(map);
-
-        // setCoordinates([lng, lat]);        
-
+        console.log(startPlaced)
+    
+        if (!startPlacedRef.current) {  // Check ref value instead of state
+          startPlacedRef.current = true;  // Update the ref directly
+    
+          new mapboxgl.Marker({ color: 'black' })
+            .setLngLat([lng, lat])
+            .addTo(map);
+        }
+    
+    
+        // Optional: set the coordinates (if you still need them to update)
+        // setCoordinates([lng, lat]);
+    
         // Get pixel position of click
         const canvas = map.getCanvas();
         const rect = canvas.getBoundingClientRect();
