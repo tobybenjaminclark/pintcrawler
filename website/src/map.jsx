@@ -3,6 +3,23 @@ import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DistanceSlider from "./DistanceSlider.jsx";
 import { Push } from "./link.jsx";
+import warriorImg from "./warrior.png";  
+
+import otherImg from "./other.png";      
+
+
+
+import peasantImg from "./peasant.png"; 
+
+import knightImg from "./knight.png";  
+
+import nomadImg from "./NOMAD.png"
+
+import badBeer from "./brokenbeer.png"
+
+import goodBeer from "./goodbeer.png"
+
+
 
 import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
@@ -244,58 +261,341 @@ const Map = () => {
   }, coordinatesRef.current);
 
   return (
+
     <div className="map-wrapper">
+
       <div ref={mapContainerRef} className="map-container" />
 
+
+
       {markerInfoVisible && (
+
         <div
+
           className="marker-overlay"
+
           style={{
+
             position: "absolute",
+
             top: markerInfoPosition.y - 40, // Position overlay slightly above marker
+
             left: markerInfoPosition.x - 20, // Center horizontally above marker
+
             backgroundColor: "white",
+
             padding: "10px",
+
             borderRadius: "5px",
+
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+
             zIndex: 10,
+
           }}
+
         >
+
           {markerInfoContent}
+
         </div>
+
       )}
 
+
+
       {overlayVisible && lock && (
+
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
-          <div>
-            Draft Your Desire
-            <button className="close-button" onClick={() => setOverlayVisible(false)}>X</button>
-          </div>
-          taverns territory
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+  <p style={{ fontSize: 35, margin: 0 }}>Draft your desire</p>
+
+  <button className="close-button" onClick={() => setOverlayVisible(false)} style={{ border: 'none', background: 'none', fontSize: '25px', cursor: 'pointer' }}>
+
+    X
+
+  </button>
+
+</div>
+
+          <p style={{ fontSize: 25 }}>Taverns Territory</p>
+
           <DistanceSlider min={0} max={5} step={0.1} onChange={setSliderValue} />
-          Merit of the mead
+
+          <p style={{ fontSize: 25 }}>Merit of the mead</p>
+
           <div className="rating">
-            <button onClick={min} style={{ backgroundColor: rating === 0 ? '#a4764a' : '' }}>Bottom of Barrel</button>
-            <button onClick={max} style={{ backgroundColor: rating === 1 ? '#d4af37' : '' }}>High of Hops</button>
-          </div>
-          Will to Wander
-          <div className="rating">
-            <button onClick={low} style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>American</button>
-            <button onClick={medium} style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>British</button>
-            <button onClick={high} style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>Olympian</button>
-          </div>
-          <p style={{ fontSize: 25 }}>{title}</p>
-          <div className="warrior" style={{ display: 'flex', alignItems: 'center' }}>
-            <p1 style={{ marginRight: '10px' }}>{description}</p1>
-            <button onClick={WarriorMode} className="special-button" style={{ backgroundColor: warriorMode === true ? '#F00707FF' : '', color: warriorMode ? 'black' : '', border: 'none' }}></button>
-          </div>
-          <div>
-            Signed
-            <button onClick={send}>..............</button>
-          </div>
+
+          <div style={{ display: "flex", alignItems: "center" }}>
+
+          <button
+
+            onClick={min}
+
+            style={{
+
+              backgroundColor: rating === 0 ? "#a4764a" : "",
+
+              border: "2px solid black",
+
+              cursor: "pointer",
+
+              marginRight: "10px", // 10px spacing to the next button
+
+            }}
+
+          >
+
+            <img
+
+              src={badBeer}      // Replace with your image import/path
+
+              alt="Bottom of Barrel"
+
+              style={{ width: "30px", height: "30px" }}
+
+            />
+
+            <div>Bottom of Barrel</div>
+
+          </button>
+
+
+
+          <button
+
+            onClick={max}
+
+            style={{
+
+              backgroundColor: rating === 1 ? "#d4af37" : "",
+
+              border: "2px solid black",
+
+              cursor: "pointer",
+
+            }}
+
+          >
+
+            <img
+
+              src={goodBeer}        // Replace with your image import/path
+
+              alt="High of Hops"
+
+              style={{ width: "30px", height: "30px" }}
+
+            />
+
+            <div>High of Hops</div>
+
+          </button>
+
         </div>
-      )}
+
+            </div>
+
+            <p style={{ fontSize: 25 }}>Will to Wander</p>
+
+            <div className="rating">
+
+              <button
+
+                onClick={low}
+
+                style={{
+
+                  backgroundColor: walk === 0 ? "#a4764a" : "",
+
+                  border: "2px solid black",
+
+                  cursor: "pointer",
+
+                  margin: "0 10px 0 0", // 10px right margin
+
+                }}
+
+              >
+
+                <img
+
+                  src={peasantImg}
+
+                  alt="Peasant"
+
+                  style={{ width: "30px", height: "30px" }}
+
+                />
+
+                <div>Peasant</div>
+
+              </button>
+
+
+
+              <button
+
+                onClick={medium}
+
+                style={{
+
+                  backgroundColor: walk === 1 ? "#FFBF00" : "",
+
+                  border: "2px solid black",
+
+                  cursor: "pointer",
+
+                  margin: "0 10px 0 0", // 10px right margin
+
+                }}
+
+              >
+
+                <img
+
+                  src={knightImg}
+
+                  alt="Knight"
+
+                  style={{ width: "30px", height: "30px" }}
+
+                />
+
+                <div>Knight</div>
+
+              </button>
+
+
+
+              <button
+
+                onClick={high}
+
+                style={{
+
+                  backgroundColor: walk === 2 ? "#e32636" : "",
+
+                  border: "2px solid black",
+
+                  cursor: "pointer",
+
+                  margin: "0 10px 0 0", // 10px right margin
+
+                }}
+
+              >
+
+                <img
+
+                  src={nomadImg}
+
+                  alt="Nomad"
+
+                  style={{ width: "30px", height: "30px" }}
+
+                />
+
+                <div>Nomad</div>
+
+              </button>
+
+            </div>
+
+
+
+          <p style={{ fontSize: 25 }}>{title}</p>
+
+          <div className="warrior" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+
+  <p1 style={{ marginRight: '10px', flex: 1 }}>{description}</p1>
+
+  
+
+  <button
+
+    onClick={WarriorMode}
+
+    className="special-button"
+
+    style={{
+
+      // Make the button square:
+
+      width: "60px",
+
+      height: "60px",
+
+
+
+      // Toggle background color based on warriorMode:
+
+      backgroundColor: warriorMode ? "#F00707FF" : "#FFBF00",
+
+
+
+      // Square edges and a black border:
+
+      border: "2px solid black",
+
+      borderRadius: 0,  // Ensures no rounded corners
+
+
+
+      cursor: "pointer",
+
+      padding: 0  // Ensures no extra space around the image
+
+    }}
+
+  >
+
+    <img
+
+      src={warriorMode ? warriorImg : otherImg}
+
+      alt={warriorMode ? "Warrior Mode" : "Other Mode"}
+
+      style={{
+
+        width: "100%",
+
+        height: "100%",
+
+        objectFit: "cover", // Make the image fill the button
+
+        display: "block"
+
+      }}
+
+    />
+
+  </button>
+
+
+
     </div>
+
+          <div>
+
+          <span onClick={send} className="signed-text">
+
+          Yours Faithfully, Templar.
+
+          </span>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
   );
+
 };
+
 export default Map;

@@ -70,7 +70,7 @@ button:before {
   left: 5px; 
   right: 5px;
   bottom: 5px;
-  background-color: #ffffff; /* Grey border area */
+  background-color: 6A4E3C; /* Grey border area */
   z-index: -1;
   border-radius: 0px;
 
@@ -109,7 +109,7 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f30000;
+    background-color: #cdbb9e;
   }
 }
 
@@ -144,7 +144,6 @@ button:focus-visible {
 
 
 .special-button {
-  position: absolute;
   background-color: #00ff3c; /* Solid green background */
   border: none; /* Remove any borders */
   font-size: 24px; /* Text size */
@@ -157,6 +156,7 @@ button:focus-visible {
   height: auto; /* Ensure the height is based on the content */
   display: inline-block; /* Adjust button layout */
   box-sizing: border-box; /* Ensure padding is included in the button's dimensions */
+  margin-left: auto; /* This ensures the button is pushed to the right */
 }
 
 .special-button:hover {
@@ -178,4 +178,66 @@ button:focus-visible {
   z-index: -1;
   border-radius: 0px;
 
+}
+/* Reduce margin between titles and sliders/buttons */
+.map-overlay p {
+  margin-bottom: -15px; /* Reduce bottom margin */
+}
+
+.map-overlay .rating {
+  margin-top: 5px; /* Reduce top margin for rating buttons */
+  margin-bottom: 5px; /* Reduce bottom margin for rating buttons */
+}
+
+.distance-slider {
+  margin-top: 0px; /* Reduce space above the slider */
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Additional custom styling for your warrior description section */
+.warrior p1 {
+  margin-top: 0px; /* Adjust margin to reduce space */
+  margin-bottom: 0px;
+}
+/* Target the slider itself */
+input[type="range"] {
+  width: 100%; /* Make the slider take up 100% of the width of its container */
+  max-width: 600px; /* Optional: Limit the max width */
+  -webkit-appearance: none; /* Remove default styling in some browsers */
+  appearance: none; /* Remove default styling in some browsers */
+  height: 8px; /* Adjust the height of the slider track */
+  background: #3e412cc7; /* Slider track color */
+  border-radius: 5px; /* Optional: Give the slider a rounded track */
+  outline: none; /* Remove focus outline */
+}
+
+/* Style the thumb (the part you drag) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Remove default thumb styling */
+  appearance: none;
+  width: 20px; /* Set the thumb width */
+  height: 20px; /* Set the thumb height */
+  background: #000000; /* Thumb color */
+  border-radius: 50%; /* Make the thumb circular */
+  cursor: pointer; /* Change cursor when hovering over the thumb */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px; /* Set the thumb width for Firefox */
+  height: 20px; /* Set the thumb height for Firefox */
+  background: #000000; /* Thumb color */
+  border-radius: 50%; /* Make the thumb circular */
+  cursor: pointer; /* Change cursor when hovering over the thumb */
+}
+
+.signed-text {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.signed-text:hover {
+  color: red;
 }
