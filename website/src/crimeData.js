@@ -44,17 +44,20 @@ export const plotCrimes = (map, crimes) => {
     data: crimeData,
   });
 
-  // Add a layer to display the crime points
-  map.addLayer({
-    id: 'crime-layer',
-    type: 'circle',
-    source: 'crime-source',
-    paint: {
-      'circle-color': '#ff0000', // Red color for the crime markers
-      'circle-radius': 6,        // Size of the marker
-      'circle-opacity': 0.7,     // Opacity of the marker
-    },
-  });
+// Add a layer to display the crime points with a black outline
+map.addLayer({
+  id: 'crime-layer',
+  type: 'circle',
+  source: 'crime-source',
+  paint: {
+    'circle-color': '#ff0000',    // Red color for the crime markers
+    'circle-radius': 6,           // Size of the marker
+    'circle-opacity': 0.7,        // Opacity of the marker
+    'circle-stroke-color': '#000000', // Black outline for the marker
+    'circle-stroke-width': 2,     // Width of the outline
+  },
+});
+
 
   // Optional: Add popups when clicking a crime marker
   map.on('click', 'crime-layer', (e) => {
