@@ -10,18 +10,28 @@ def hello_http():
     Endpoint that mimics the behavior of your Cloud Function.
     Expects a JSON payload with "lat" and "long" keys.
     """
-    print("testinggg")
     request_json = request.get_json(silent=True)
-    print("testingggfdasfsaf")
-    if request_json and "lat" in request_json and "long" in request_json:
-        print(request_json)
-        # Call your main_router function with the provided latitude and longitude.
-        result = main_router(request_json["lat"], request_json["long"])
-        return jsonify(result)
-    else:
-        print("test1")
-        # Return an error response if required parameters are missing.
-        return jsonify({"error": 100}), 400
+
+    required_params = [
+        "lat",
+        "long",
+        "maximise_rating",
+        "range",
+        "walking",
+        "warrior_mode"
+    ]
+
+    missing = False
+    for param in required_params:
+        if param not in request_json:
+            print(f"{param} missing from JSON")
+            missing = True
+        if missing:
+            return jsonify({"error": 100}), 400
+
+    result = main_router(request_json["lat"], request_json["long"], request_json)
+    return jsonify(result)
+
 CORS(app, 
      resources={r"/*": {"origins": "*"}},
      supports_credentials=True,

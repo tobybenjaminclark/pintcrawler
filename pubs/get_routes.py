@@ -8,19 +8,105 @@ import re
 import math
 from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
-from get_pubs import PubData, get_pubs, normalize_pub_ratings
+from get_pubs import PubData, get_pubs, normalize_pub_ratings, get_unique_crimes_for_pubs, adjust_pub_ratings_for_crime
 from api_key import API_KEY
-from graph import UndirectedGraph
-from location import Location
 from visualise import visualize_graph
-from router import get_all_routes
 from route import Route, Pub  # Import your dataclasses for route segments
 import polyline  # used to decode encoded polylines
 import json
+from graph import UndirectedGraph
+from location import Location
 
 gmaps = googlemaps.Client(key=API_KEY)
 
-MAX_PUBS = 4
+EDGE_WEIGHT = 1
+WARRIOR_MODE = False
+VISIT_BAD_PUBS = False
+WALKING_PREFERENCE = 2
+
+MAX_PUBS = 6
+
+
+def get_vertex_weight(current: Location) -> float:
+
+    if VISIT_BAD_PUBS or WARRIOR_MODE:
+        return -current.attr["rating"]
+    elif not VISIT_BAD_PUBS:
+        return current.attr["rating"]
+
+
+import math
+
+# Add a constant for the maximum allowed turning angle (in radians).
+# (Adjust the threshold as desired—here 150° is used.)
+ANGLE_THRESHOLD = math.radians(150)
+
+def get_all_routes_from_vertex(graph, start):
+    """
+    Given an undirected graph and a starting vertex,
+    return all simple routes (paths) starting at that vertex that contain
+    between 3 and 5 pubs (inclusive).
+    Each route is represented as a tuple (route, weight) where:
+      - route: list of vertices
+      - weight: the total weight of the route
+    """
+    def dfs(current, path, current_weight=0.0):
+        routes = []
+        path_length = len(path)
+
+        # If the path has between 3 and 5 vertices, record it.
+        if 3 <= path_length <= 5:
+            routes.append((path, current_weight))
+
+        # Do not extend beyond 5 pubs.
+        if path_length == 5:
+            return routes
+
+        # Try extending the path.
+        for neighbor, edge_cost in graph.get_neighbors(current):
+            if neighbor not in path:
+                # If we already have at least two pubs, check the turning angle.
+                if len(path) >= 2:
+                    A = path[-2]      # previous pub
+                    B = current       # current pub
+                    C = neighbor      # candidate next pub
+                    # Compute the two vectors:
+                    # Vector from A to B
+                    v = (B.latitude - A.latitude, B.longitude - A.longitude)
+                    # Vector from B to C
+                    w = (C.latitude - B.latitude, C.longitude - B.longitude)
+                    norm_v = math.sqrt(v[0] ** 2 + v[1] ** 2)
+                    norm_w = math.sqrt(w[0] ** 2 + w[1] ** 2)
+                    # Only check the angle if both vectors are nonzero
+                    if norm_v > 0 and norm_w > 0:
+                        dot = v[0] * w[0] + v[1] * w[1]
+                        # Clamp the cosine to the valid range [-1, 1] to avoid numerical errors.
+                        cos_angle = max(-1, min(1, dot / (norm_v * norm_w)))
+                        angle = math.acos(cos_angle)
+                        # If the turning angle is greater than the threshold, skip this neighbor.
+                        if angle > ANGLE_THRESHOLD:
+                            continue
+
+                # Update the weight and continue the DFS.
+                new_weight = current_weight - (edge_cost * EDGE_WEIGHT) + get_vertex_weight(current)
+                routes.extend(dfs(neighbor, path + [neighbor], new_weight))
+        return routes
+
+    return dfs(start, [start])
+
+
+
+def get_all_routes(graph):
+    """
+    For each vertex in the graph, compute all routes starting from that vertex.
+    Returns a dictionary mapping each starting vertex to the list of its routes.
+    """
+    all_routes = {}
+    for vertex in graph.vertices():
+        all_routes[vertex] = get_all_routes_from_vertex(graph, vertex)
+        gl_routes = []
+
+    return all_routes
 
 
 def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubData]:
@@ -161,24 +247,58 @@ def add_shortest_edges_to_connect_graph(graph: UndirectedGraph, pubs: list[Locat
     return graph
 
 
-def main_router(lat, long, show = False) -> list[Route]:
+def main_router(lat, long, attr, show = False) -> list[Route]:
     """
     Main routine: fetch pubs, build the route graph, select the best route,
     and then for each consecutive pair of pubs in the best route, call the directions API
     to retrieve (and decode) the polyline. For each segment a Route object is created.
     The function returns the list of Route objects for the best route.
     """
+    global WARRIOR_MODE
+    global WALKING_PREFERENCE
+    global VISIT_BAD_PUBS
+    global EDGE_WEIGHT
+
+    # Configure attributes
+    WARRIOR_MODE = attr["warrior_mode"]
+    print("WARRIOR_MODE is {}".format(WARRIOR_MODE))
+
+    if attr["maximise_rating"] == 1: VISIT_BAD_PUBS = False
+    elif attr["maximise_rating"] == 0: VISIT_BAD_PUBS = True
+    else: print("VISIT_BAD_PUBS Defaulted to False")
+    print("VISIT_BAD_PUBS IS {}".format(VISIT_BAD_PUBS))
+
+    WALKING_PREFERENCE = attr["walking"]
+    print("WALKING PREFERENCE IS {}".format(WALKING_PREFERENCE))
+    match WALKING_PREFERENCE:
+        case 0: EDGE_WEIGHT = 5
+        case 1: EDGE_WEIGHT = 2
+        case 2: EDGE_WEIGHT = 0.3
+    print("EDGE WEIGHT IS {}".format(EDGE_WEIGHT))
+
     # Get pubs and build graph
     longitude, latitude  = long, lat
-    radius_km = 8
+    radius_km = attr["range"]
     print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
-    pubs = normalize_pub_ratings(pubs)
-    print(pubs)
+
+    # Now, for each pub we want to incorporate nearby crime:
+    unique_crimes = get_unique_crimes_for_pubs(pubs, date="2024-01")
+    print(f"\nTotal unique crimes found across all pubs: {len(unique_crimes)}")
+
+    if WARRIOR_MODE: crime_penalty = -10
+    else: crime_penalty = 3
+    adjust_pub_ratings_for_crime(pubs, unique_crimes, threshold_km=0.3, penalty_per_crime=crime_penalty)
+
     routes = fetch_pub_routes(pubs)
-    print(routes)
+
+    for pub in pubs:
+        if VISIT_BAD_PUBS or WARRIOR_MODE:
+            pub.rating = -pub.rating
+        print(f"{pub.name} is rated {pub.rating}")
+
+
     graph, pub_map = create_graph_from_routes(routes, pubs)
-    print(graph, pub_map)
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
     # Get all routes from the graph (each route is a list of vertices with a weight)
@@ -187,7 +307,8 @@ def main_router(lat, long, show = False) -> list[Route]:
     for start_pub, routes_list in routes_by_pub.items():
         for route, w in routes_list:
             gl_routes.append((route, w))
-    gl_routes = list(filter(lambda route: len(route[0]) < MAX_PUBS, gl_routes))
+
+    gl_routes = list(filter(lambda route: len(route[0]) <= MAX_PUBS, gl_routes))
 
     # Select best (and worst) route by weight
     best_node_w = -math.inf
@@ -202,18 +323,6 @@ def main_router(lat, long, show = False) -> list[Route]:
             worst_node_w = w
             worst_node = _r
 
-    print("\n\nBest Route")
-    print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
-    print(best_node)
-    for n in best_node:
-        print(" > " + str(n), end="")
-    print("\n\nWorst Route")
-    print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
-    print(worst_node)
-    for n in worst_node:
-        print(" > " + str(n), end="")
-    print("\n")
-
     # Now build the list of Route objects for the best route.
     best_route_segments = []
     if best_node and len(best_node) >= 2:
@@ -227,11 +336,13 @@ def main_router(lat, long, show = False) -> list[Route]:
                     loc=(best_node[i].latitude, best_node[i].longitude),
                     rating=best_node[i].attr.get("rating", 0)
                 )
+
                 end_pub = Pub(
                     name=best_node[i + 1].name,
                     loc=(best_node[i + 1].latitude, best_node[i + 1].longitude),
                     rating=best_node[i + 1].attr.get("rating", 0)
                 )
+
                 best_route_segments.append(Route(
                     start_node=start_pub,
                     end_node=end_pub,
@@ -245,6 +356,7 @@ def main_router(lat, long, show = False) -> list[Route]:
         visualize_graph(graph)
 
     return best_route_segments
+
 
 def dataclass_to_json(obj: any) -> str:
     """
