@@ -176,7 +176,7 @@ const Map = () => {
               type: "line",
               source: `route-${index}`,
               layout: { "line-join": "round", "line-cap": "round" },
-              paint: { "line-color": "black", "line-width": 4 },
+              paint: { "line-color": "#black", "line-width": 4 },
             });
           }
         });
