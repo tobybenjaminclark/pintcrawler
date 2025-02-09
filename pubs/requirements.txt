@@ -4,3 +4,4 @@ googlemaps
 geopy
 polyline
 functions-framework
+nltk

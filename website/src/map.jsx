@@ -4,6 +4,9 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import DistanceSlider from "./DistanceSlider.jsx";
 import { Push } from "./link.jsx";
 import { getCrimesByPoint, plotCrimes } from "./crimeData";
+import warriorImg from "./warrior.png";  
+import otherImg from "./other.png";      
+
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
@@ -21,8 +24,8 @@ const Map = () => {
   const [startPlaced, setStartPlaced] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for response
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
-  const [title, setTitle] = useState("Weakling");
-  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
+  const [title, setTitle] = useState("Path of the Peacekeeper");
+  const [description, setDescription] = useState("Evade Conflict on your path to draughts transcendence.");
 
   const startPlacedRef = useRef(false); // Use ref instead of state
 
@@ -34,13 +37,13 @@ const Map = () => {
   const WarriorMode = () => {
     setWarriorMode(!warriorMode);
     if (!warriorMode) {
-      setDescription("The warrior wanders with immense power, prepared for any challenge that lies ahead!");
-      setTitle("A worthy One");
+      setDescription("Fight through land filled with thieves, turmoil, and discord.");
+      setTitle("The Warriors Walk");
     } else {
-      setDescription("A brave soul, lucky but special to dare walk the criminal lands");
-      setTitle("Weakling");
+      setDescription("Evade Conflict on your path to draughts transcendence.");
+      setTitle("Path of the Peacekeeper");
     }
-  };
+  };    
 
   const send = async () => {
     try {
@@ -188,7 +191,7 @@ const Map = () => {
     X
   </button>
 </div>
-          <p style={{ fontSize: 25 }}>taverns territory</p>
+          <p style={{ fontSize: 25 }}>Taverns Territory</p>
           <DistanceSlider min={0} max={5} step={0.1} onChange={setSliderValue} />
           <p style={{ fontSize: 25 }}>Merit of the mead</p>
           <div className="rating">
@@ -204,23 +207,42 @@ const Map = () => {
           <p style={{ fontSize: 25 }}>{title}</p>
           <div className="warrior" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
   <p1 style={{ marginRight: '10px', flex: 1 }}>{description}</p1>
-  <button 
-    onClick={WarriorMode} 
+  
+  <button
+    onClick={WarriorMode}
     className="special-button"
     style={{
-      backgroundColor: warriorMode ? "#F00707FF" : "#1A244DFF", // Red when warriorMode is on
-      color: warriorMode ? "black" : "",
-      border: "none"
-    }}
-    
-  >
-    {/* Button content */}
-  </button>
-</div>
+      // Make the button square:
+      width: "60px",
+      height: "60px",
 
+      // Toggle background color based on warriorMode:
+      backgroundColor: warriorMode ? "#F00707FF" : "#FFBF00",
+
+      // Square edges and a black border:
+      border: "2px solid black",
+      borderRadius: 0,  // Ensures no rounded corners
+
+      cursor: "pointer",
+      padding: 0  // Ensures no extra space around the image
+    }}
+  >
+    <img
+      src={warriorMode ? warriorImg : otherImg}
+      alt={warriorMode ? "Warrior Mode" : "Other Mode"}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover", // Make the image fill the button
+        display: "block"
+      }}
+    />
+  </button>
+
+    </div>
           <div>
             Signed
-            <button onClick={send}>..............</button>
+            <button onClick={send}>Send</button>
           </div>
         </div>
       )}

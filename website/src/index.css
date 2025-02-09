@@ -176,8 +176,8 @@ button:focus-visible {
 }
 
 .map-overlay .rating {
-  margin-top: 0px; /* Reduce top margin for rating buttons */
-  margin-bottom: 0px; /* Reduce bottom margin for rating buttons */
+  margin-top: 5px; /* Reduce top margin for rating buttons */
+  margin-bottom: 5px; /* Reduce bottom margin for rating buttons */
 }
 
 .distance-slider {
