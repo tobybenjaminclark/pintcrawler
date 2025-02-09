@@ -34,13 +34,13 @@ export function Push(input) {
   const requestData = { lat: input[0], long: input[1] };
 
   console.log('Sending request:', {
-    method: 'POST',
-    url: 'https://get-route-863661396582.europe-north1.run.app/get-route',
+    method: 'post',
+    url: 'http://localhost:5069/',
     data: requestData
   });
   axios({
-    method: 'POST',
-    url: 'https://get-route-863661396582.europe-north1.run.app/get-route',
+    method: 'post',
+    url: 'http://localhost:5069/',
     data: requestData,
     
     

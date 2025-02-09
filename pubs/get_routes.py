@@ -236,7 +236,7 @@ def main_router(lat, long) -> list[Route]:
                 ))
 
     # Optionally, visualize the graph.
-    visualize_graph(graph)
+    #visualize_graph(graph)
 
     return best_route_segments
 
