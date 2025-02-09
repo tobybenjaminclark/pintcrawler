@@ -22,6 +22,7 @@ class PubData:
     phone_number: str = "Unknown Phone Number"
     website: str = "Unknown Website"
     photo_reference: str = ""
+    reviews: dict = ""
     nearby_crimes: int = 0
 
     def __str__(self):
@@ -62,7 +63,8 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_km: int) ->
             place_id=place_id,
             fields=["formatted_address", "formatted_phone_number", "international_phone_number", "opening_hours", 
                     "website", "rating", "user_ratings_total", "photo", "serves_beer", 
-                    "serves_breakfast", "serves_brunch", "serves_dinner", "serves_lunch", "serves_vegetarian_food"]
+                    "serves_breakfast", "serves_brunch", "serves_dinner", "serves_lunch", "serves_vegetarian_food",
+                    "reviews"]
         )
         
         details = place_details.get("result", {})
@@ -70,6 +72,7 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_km: int) ->
         user_ratings_total = details.get("user_ratings_total", 0)
         phone_number = details.get("formatted_phone_number", "Unknown Phone Number")
         website = details.get("website", "Unknown Website")
+        reviews = details.get("reviews", [])  # This will be a list of review dictionaries
 
         # Optionally, check for photos (only first photo reference for now)
         photo_reference = details.get("photos", [{}])[0].get("photo_reference", "")
@@ -87,9 +90,16 @@ def get_pubs(api_key: str, latitude: float, longitude: float, radius_km: int) ->
             user_ratings_total=user_ratings_total,
             phone_number=phone_number,
             website=website,
-            photo_reference=photo_reference
+            photo_reference=photo_reference,
+            reviews = reviews
         ))
-    
+
+    for review in reviews:
+        print(review.get("author_name"))
+        print(review.get("rating"))
+        print(review.get("text"))
+        print(review.get("time"))
+
     pubs = filter_pubs_within_radius(pubs, latitude, longitude, radius_km)
     return pubs
 
