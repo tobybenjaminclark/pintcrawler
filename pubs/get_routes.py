@@ -10,21 +10,75 @@ from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
 from get_pubs import PubData, get_pubs, normalize_pub_ratings
 from api_key import API_KEY
-from graph import UndirectedGraph
-from location import Location
 from visualise import visualize_graph
-from router import get_all_routes
 from route import Route, Pub  # Import your dataclasses for route segments
 import polyline  # used to decode encoded polylines
 import json
+from graph import UndirectedGraph
+from location import Location
 
 gmaps = googlemaps.Client(key=API_KEY)
 
+EDGE_WEIGHT = 1
 WARRIOR_MODE = False
 VISIT_BAD_PUBS = False
 WALKING_PREFERENCE = 2
 
-MAX_PUBS = 4
+MAX_PUBS = 6
+
+
+def get_vertex_weight(current: Location) -> float:
+
+    if VISIT_BAD_PUBS:
+        return -current.attr["rating"]
+    elif not VISIT_BAD_PUBS:
+        return current.attr["rating"]
+
+
+def get_all_routes_from_vertex(graph, start):
+    """
+    Given an undirected graph and a starting vertex,
+    return all simple routes (paths) starting at that vertex that contain
+    between 3 and 5 pubs (inclusive).
+    Each route is represented as a tuple (route, weight) where:
+      - route: list of vertices
+      - weight: the total weight of the route
+    """
+
+    def dfs(current, path, current_weight=0.0):
+        routes = []
+        path_length = len(path)
+
+        # If the path has between 3 and 5 vertices, record it.
+        if 3 <= path_length <= 5:
+            routes.append((path, current_weight))
+
+        # If we have reached 5 pubs, do not extend further.
+        if path_length == 5:
+            return routes
+
+        # Try extending the path.
+        for neighbor, edge_cost in graph.get_neighbors(current):
+            if neighbor not in path:
+                # Update the weight: subtract the edge cost (scaled) and add the current vertex's weight.
+                new_weight = current_weight - (edge_cost * EDGE_WEIGHT) + get_vertex_weight(current)
+                routes.extend(dfs(neighbor, path + [neighbor], new_weight))
+        return routes
+
+    return dfs(start, [start])
+
+
+def get_all_routes(graph):
+    """
+    For each vertex in the graph, compute all routes starting from that vertex.
+    Returns a dictionary mapping each starting vertex to the list of its routes.
+    """
+    all_routes = {}
+    for vertex in graph.vertices():
+        all_routes[vertex] = get_all_routes_from_vertex(graph, vertex)
+        gl_routes = []
+
+    return all_routes
 
 
 def get_nearest_pubs(pub: PubData, pubs: list[PubData], n: int = 3) -> list[PubData]:
@@ -175,6 +229,7 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     global WARRIOR_MODE
     global WALKING_PREFERENCE
     global VISIT_BAD_PUBS
+    global EDGE_WEIGHT
 
     # Configure attributes
     print("WARRIOR_MODE is {}".format(WARRIOR_MODE))
@@ -187,11 +242,15 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
 
     WALKING_PREFERENCE = attr["walking"]
     print("WALKING PREFERENCE IS {}".format(WALKING_PREFERENCE))
-
+    match WALKING_PREFERENCE:
+        case 0: EDGE_WEIGHT = 5
+        case 1: EDGE_WEIGHT = 2
+        case 2: EDGE_WEIGHT = 0.3
+    print("EDGE WEIGHT IS {}".format(EDGE_WEIGHT))
 
     # Get pubs and build graph
     longitude, latitude  = long, lat
-    radius_km = 8
+    radius_km = attr["range"]
     print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
     pubs = normalize_pub_ratings(pubs)
@@ -206,7 +265,8 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     for start_pub, routes_list in routes_by_pub.items():
         for route, w in routes_list:
             gl_routes.append((route, w))
-    gl_routes = list(filter(lambda route: len(route[0]) < MAX_PUBS, gl_routes))
+
+    gl_routes = list(filter(lambda route: len(route[0]) <= MAX_PUBS, gl_routes))
 
     # Select best (and worst) route by weight
     best_node_w = -math.inf
@@ -252,6 +312,7 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
         visualize_graph(graph)
 
     return best_route_segments
+
 
 def dataclass_to_json(obj: any) -> str:
     """
