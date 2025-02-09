@@ -15,6 +15,7 @@ const Map = () => {
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
   const [warriorMode, setWarriorMode] = useState(false);
+  const [lock, setLock] = useState(true);
   const min = () => {
     setRating(0);
     }
@@ -33,13 +34,23 @@ const Map = () => {
     const WarriorMode = () => {
         setWarriorMode(!warriorMode);
     }
-    const send = () => {
-        console.log("test");
-        console.log(coordinates);
-        const data = [coordinates[0],coordinates[1],sliderValue,rating,walk,warriorMode]
-        console.log(
-            Push(data)
-        );
+    const send = async () => {
+        try {
+            console.log("test");
+            console.log(coordinates);
+    
+            const data = [coordinates[0], coordinates[1], sliderValue, rating, walk, warriorMode];
+    
+            console.log("Sending data:", data);
+    
+            const response = await Push(data); // Await the async function
+    
+            console.log("Push response:", response);
+    
+            setLock(false);
+        } catch (error) {
+            console.error("Error in send function:", error);
+        }
     }
 
 
@@ -57,7 +68,8 @@ const Map = () => {
 
     
 
-    map.on("click", (event) => {
+    map.on("click", async (event) => {
+      if(lock){
       event.preventDefault();
       const { lng, lat } = event.lngLat;
       setCoordinates([lng, lat]);
@@ -68,6 +80,8 @@ const Map = () => {
       setOverlayVisible(true);
 
       setOverlayVisible(true); // Show overlay
+        }
+      
     });
 
     new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
@@ -79,7 +93,7 @@ const Map = () => {
     <div className="map-wrapper">
       <div ref={mapContainerRef} className="map-container" />
 
-      {overlayVisible && ( 
+      {overlayVisible && lock && ( 
         
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x} }>
             
