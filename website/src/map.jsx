@@ -11,9 +11,10 @@ const Map = () => {
   const [coordinates, setCoordinates] = useState([-0.5658, 51.4258]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayPosition, setOverlayPosition] = useState({ x: 0, y: 0 });
-  const [sliderValue, setSliderValue] = useState(25);
+  const [sliderValue, setSliderValue] = useState(2.5);
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
+  const [warriorMode, setWarriorMode] = useState(0);
   const min = () => {
     setRating(0);
     }
@@ -32,8 +33,9 @@ const Map = () => {
     const send = () => {
         console.log("test");
         console.log(coordinates);
+        const data = [coordinates[0],coordinates[1],sliderValue,rating,walk]
         console.log(
-            Push(coordinates)
+            Push(data)
         );
     }
 
@@ -84,7 +86,7 @@ const Map = () => {
           
           </div>
           taverns territory
-          <DistanceSlider min={0} max={50} step={0.1} onChange={setSliderValue} />
+          <DistanceSlider min={0} max={5} step={0.1} onChange={setSliderValue} />
           Merit of the mead
           <div className="rating">
             <button onClick={min}
