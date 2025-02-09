@@ -97,7 +97,7 @@ const Map = () => {
   
             popupContent += `</div>`;
   
-            const marker = new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker({color: "black"})
               .setLngLat([lng, lat])
               .addTo(map);
   
@@ -134,7 +134,7 @@ const Map = () => {
   
             popupContent += `</div>`;
   
-            const marker = new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker({color: "black"})
               .setLngLat([lng, lat])
               .addTo(map);
   
@@ -176,7 +176,7 @@ const Map = () => {
               type: "line",
               source: `route-${index}`,
               layout: { "line-join": "round", "line-cap": "round" },
-              paint: { "line-color": "#ff0000", "line-width": 4 },
+              paint: { "line-color": "black", "line-width": 4 },
             });
           }
         });
@@ -224,7 +224,7 @@ const Map = () => {
         if (!startPlacedRef.current) {  // Check ref value instead of state
           startPlacedRef.current = true;  // Update the ref directly
     
-          new mapboxgl.Marker({ color: 'black' })
+          new mapboxgl.Marker({ color: 'red' })
             .setLngLat([lng, lat])
             .addTo(map);
         }
