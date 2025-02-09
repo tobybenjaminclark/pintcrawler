@@ -20,11 +20,12 @@ html, body, #root {
   position: relative;
   z-index: 1;
   pointer-events: none; /* Allow clicks to pass through where no interactive element exists */
+  
 }
 
 /* If you need the h1 (or any interactive element) to handle pointer events, re-enable them */
 .overlay h1 {
-
+  
   text-align: center;
   margin: 0px 0;
   color: rgb(0, 0, 0); /* ensure contrast over the map */
@@ -55,4 +56,23 @@ html, body, #root {
   align-items: center;
   gap: 10px;
   width: 400px;
+  color: #000000;
+  font-size: 200;
+}
+
+@font-face {
+  font-family: 'medieval';
+  src: url('./assets/medieval4.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: 1em;
+}
+.element-class {
+  font-family: 'medieval';
+  letter-spacing: 0.05em; /* Adjust the value to make it wider or narrower */
+}
+
+body {
+  font-family: 'medieval', sans-serif;
+  letter-spacing: 0.1em;
 }

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import DistanceSlider from "./DistanceSlider.jsx"
+import DistanceSlider from "./DistanceSlider.jsx";
+import {Push} from "./link.jsx";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
@@ -29,16 +30,18 @@ const Map = () => {
         setWalk(2);
         }
     const send = () => {
-        console.log("rating: ", rating);
-        console.log("distance: ",sliderValue)
-        console.log("walk: ",walk)
+        console.log("test");
+        console.log(coordinates);
+        console.log(
+            Push(coordinates)
+        );
     }
 
 
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/ezequielm/cij7hk832007dapktzdyaemih",
       center: coordinates,
       zoom: 15,
     });
@@ -72,30 +75,42 @@ const Map = () => {
       <div ref={mapContainerRef} className="map-container" />
 
       {overlayVisible && (
+        
         <div className="map-overlay" style={{ top: overlayPosition.y, left: overlayPosition.x }}>
-          <button onClick={() => setOverlayVisible(false)}>Close</button>
+            
+            <div>
+            Draft Your Desire   
+            <button class="close-button" onClick={() => setOverlayVisible(false)}>X</button>    
+          
+          </div>
+          taverns territory
           <DistanceSlider min={0} max={50} step={0.1} onChange={setSliderValue} />
+          Merit of the mead
           <div className="rating">
             <button onClick={min}
-                style={{ backgroundColor: rating === 0 ? 'green' : '' }}>
-                 Minimum rating</button>
+                style={{ backgroundColor: rating === 0 ? '#a4764a' : '' }}>
+                 Bottom of Barrel</button>
             <button onClick={max}
-                style={{ backgroundColor: rating === 1 ? 'green' : '' }}>
-                Maximum rating</button>
+                style={{ backgroundColor: rating === 1 ? '#d4af37' : '' }}>
+                hight Of hops</button>
             </div>
+            Will to Wander
             <div className="rating">
             <button onClick={low}
-                style={{ backgroundColor: walk === 0 ? 'green' : '' }}>
+                style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>
 
                 American</button>
             <button onClick={medium}
-                style={{ backgroundColor: walk === 1 ? 'green' : '' }}>
+                style={{ backgroundColor: walk === 1 ? '#a4764a' : '' }}>
                 British</button>
                 <button onClick={high}
-                style={{ backgroundColor: walk === 2 ? 'green' : '' }}>
+                style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>
                 Olimpean</button>
             </div>
-          <button onClick={send}>Hunt</button>
+            <div>
+                Signed
+          <button onClick={send}>...</button>
+          </div>
         </div>
       )}
     </div>
