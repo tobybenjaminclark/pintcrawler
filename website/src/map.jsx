@@ -31,8 +31,6 @@ const Map = () => {
   const [startPlaced, setStartPlaced] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for response
   const [routeGenerated, setRouteGenerated] = useState(false); // New state to track if route has been generated
-  const [title, setTitle] = useState("Weakling");
-  const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
   const markersRef = useRef([]); // Store markers to manage them
 
   const [markerInfoVisible, setMarkerInfoVisible] = useState(false);
@@ -186,7 +184,7 @@ const Map = () => {
               type: "line",
               source: `route-${index}`,
               layout: { "line-join": "round", "line-cap": "round" },
-              paint: { "line-color": "#black", "line-width": 4 },
+              paint: { "line-color": "black", "line-width": 4 },
             });
           }
         });
@@ -229,6 +227,7 @@ const Map = () => {
         event.preventDefault();
         const { lng, lat } = event.lngLat;
 
+        console.log("start placed:");
         console.log(startPlaced)
     
         if (!startPlacedRef.current) {  // Check ref value instead of state
