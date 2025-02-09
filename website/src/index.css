@@ -54,6 +54,15 @@ button {
   
 }
 
+.mapboxgl-popup-content {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+
+
+
 button:before {
   content: '';
   position: absolute;

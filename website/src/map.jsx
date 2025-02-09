@@ -78,15 +78,21 @@ const Map = () => {
           if (routeData.start_node && Array.isArray(routeData.start_node.loc)) {
             const [lat, lng] = routeData.start_node.loc;
   
-            // Create a popup content with text and image
-            let popupContent = `<div style="text-align: center;">
-              <p>${routeData.start_node.name}</p>`;
-  
+            
+            let popupContent = "";
+                    
             // Fetch photo reference if available and add it to popup
             if (routeData.start_node.photo_reference) {
               const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${routeData.start_node.photo_reference}&key=AIzaSyD2-qiQoW3Qd6-ToCN9gAmW6e2RqSwJYsk`;
-  
-              popupContent += `<img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0;"/>`;
+              // Create a popup content with text and image
+              popupContent += `
+              <div style="text-align: center; background-color: #B5AE90; border: 2px solid black; padding: 10px;">
+                <p style="font-size: 20px; font-family: 'medieval', sans-serif; color: #000000;">${routeData.start_node.name}</p>
+                ${routeData.start_node.photo_reference ? `
+                  <img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0; filter: sepia(100%);"/>
+                ` : ''}
+              </div>
+            `;
             }
   
             popupContent += `</div>`;
@@ -96,7 +102,7 @@ const Map = () => {
               .addTo(map);
   
             // Create a popup for the marker
-            const popup = new mapboxgl.Popup({ offset: 25 })
+            const popup = new mapboxgl.Popup({ offset: 25 , closeButton: false})
               .setLngLat([lng, lat])
               .setHTML(popupContent);
   
@@ -109,15 +115,21 @@ const Map = () => {
           if (routeData.end_node && Array.isArray(routeData.end_node.loc)) {
             const [lat, lng] = routeData.end_node.loc;
   
-            // Create a popup content with text and image
-            let popupContent = `<div style="text-align: center;">
-              <p>${routeData.end_node.name}</p>`;
+            
+            let popupContent = "";
   
             // Fetch photo reference if available and add it to popup
             if (routeData.end_node.photo_reference) {
               const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${routeData.end_node.photo_reference}&key=AIzaSyD2-qiQoW3Qd6-ToCN9gAmW6e2RqSwJYsk`;
-  
-              popupContent += `<img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0;"/>`;
+              // Create a popup content with text and image
+            popupContent += `
+            <div style="text-align: center; background-color: #B5AE90; border: 2px solid black; padding: 10px;">
+              <p style="font-size: 20px; font-family: 'medieval', sans-serif; color: #000000;">${routeData.end_node.name}</p>
+              ${routeData.start_node.photo_reference ? `
+                <img src="${photoUrl}" alt="Photo" style="width: 100%; max-width: 200px; margin: 10px 0; filter: sepia(100%);"/>
+              ` : ''}
+            </div>
+          `;
             }
   
             popupContent += `</div>`;
@@ -127,7 +139,7 @@ const Map = () => {
               .addTo(map);
   
             // Create a popup for the marker
-            const popup = new mapboxgl.Popup({ offset: 25 })
+            const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
               .setLngLat([lng, lat])
               .setHTML(popupContent);
   
@@ -145,7 +157,6 @@ const Map = () => {
               }
               return [];
             }).filter(coord => coord.length > 0); // Ensure valid coordinates
-  
   
             // Add route layer with a unique ID based on the index
             map.addSource(`route-${index}`, {
