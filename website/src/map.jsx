@@ -164,7 +164,7 @@ const Map = () => {
     
     
         // Optional: set the coordinates (if you still need them to update)
-        // setCoordinates([lng, lat]);
+        setCoordinates([lng, lat]);
     
         // Get pixel position of click
         const canvas = map.getCanvas();
