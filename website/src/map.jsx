@@ -11,9 +11,10 @@ const Map = () => {
   const [coordinates, setCoordinates] = useState([-0.5658, 51.4258]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayPosition, setOverlayPosition] = useState({ x: 0, y: 0 });
-  const [sliderValue, setSliderValue] = useState(25);
+  const [sliderValue, setSliderValue] = useState(2.5);
   const [rating, setRating] = useState(-1);
   const [walk, setWalk] = useState(-1);
+  const [warriorMode, setWarriorMode] = useState(false);
   const min = () => {
     setRating(0);
     }
@@ -29,11 +30,15 @@ const Map = () => {
     const high = () => {
         setWalk(2);
         }
+    const WarriorMode = () => {
+        setWarriorMode(!warriorMode);
+    }
     const send = () => {
         console.log("test");
         console.log(coordinates);
+        const data = [coordinates[0],coordinates[1],sliderValue,rating,walk,warriorMode]
         console.log(
-            Push(coordinates)
+            Push(data)
         );
     }
 
@@ -84,7 +89,7 @@ const Map = () => {
           
           </div>
           taverns territory
-          <DistanceSlider min={0} max={50} step={0.1} onChange={setSliderValue} />
+          <DistanceSlider min={0} max={5} step={0.1} onChange={setSliderValue} />
           Merit of the mead
           <div className="rating">
             <button onClick={min}
@@ -106,6 +111,12 @@ const Map = () => {
                 <button onClick={high}
                 style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>
                 Olimpean</button>
+            </div>
+            <div className="warrior">
+                "Warrior Mode"
+                <button onClick={WarriorMode}
+                style={{ backgroundColor: warriorMode === true ? '#F00707FF' : '' }}>
+                </button>
             </div>
             <div>
                 Signed
