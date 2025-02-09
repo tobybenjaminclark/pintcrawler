@@ -20,6 +20,10 @@ import json
 
 gmaps = googlemaps.Client(key=API_KEY)
 
+WARRIOR_MODE = False
+VISIT_BAD_PUBS = False
+WALKING_PREFERENCE = 2
+
 MAX_PUBS = 4
 
 
@@ -168,6 +172,22 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     to retrieve (and decode) the polyline. For each segment a Route object is created.
     The function returns the list of Route objects for the best route.
     """
+    global WARRIOR_MODE
+    global WALKING_PREFERENCE
+    global VISIT_BAD_PUBS
+
+    # Configure attributes
+    print("WARRIOR_MODE is {}".format(WARRIOR_MODE))
+    WARRIOR_MODE = attr["warrior_mode"]
+
+    if attr["maximise_rating"] == 1: VISIT_BAD_PUBS = False
+    elif attr["maximise_rating"] == 0: VISIT_BAD_PUBS = True
+    else: print("VISIT_BAD_PUBS Defaulted to False")
+    print("VISIT_BAD_PUBS IS {}".format(VISIT_BAD_PUBS))
+
+    WALKING_PREFERENCE = attr["walking"]
+    print("WALKING PREFERENCE IS {}".format(WALKING_PREFERENCE))
+
 
     # Get pubs and build graph
     longitude, latitude  = long, lat
@@ -200,18 +220,6 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
         if w < worst_node_w:
             worst_node_w = w
             worst_node = _r
-
-    print("\n\nBest Route")
-    print("WEIGHT = " + str(best_node_w) + "   ::   ", end="")
-    print(best_node)
-    for n in best_node:
-        print(" > " + str(n), end="")
-    print("\n\nWorst Route")
-    print("WEIGHT = " + str(worst_node_w) + "   ::   ", end="")
-    print(worst_node)
-    for n in worst_node:
-        print(" > " + str(n), end="")
-    print("\n")
 
     # Now build the list of Route objects for the best route.
     best_route_segments = []
