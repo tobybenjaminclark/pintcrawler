@@ -25,6 +25,7 @@ const Map = () => {
   const [title, setTitle] = useState("Weakling");
   const [description, setDescription] = useState("A brave soul, lucky but special to dare walk the criminal lands");
   const markersRef = useRef([]); // Store markers to manage them
+  const coordinatesRef = useRef([-0.5658, 51.4258]); // Store markers to manage them
 
   const [markerInfoVisible, setMarkerInfoVisible] = useState(false);
   const [markerInfoContent, setMarkerInfoContent] = useState("");  // Store content for the marker info overlay
@@ -58,7 +59,7 @@ const Map = () => {
       console.log("test");
       console.log(coordinates);
   
-      const data = [coordinates[0], coordinates[1], sliderValue, rating, walk, warriorMode];
+      const data = [coordinatesRef.current[0], coordinatesRef.current[1], sliderValue, rating, walk, warriorMode];
   
       console.log("Sending data:", data);
   
@@ -176,14 +177,14 @@ const Map = () => {
               type: "line",
               source: `route-${index}`,
               layout: { "line-join": "round", "line-cap": "round" },
-              paint: { "line-color": "#black", "line-width": 4 },
+              paint: { "line-color": "black", "line-width": 4 },
             });
           }
         });
       }
   
       // Fetch and plot crimes on the map
-      const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
+      const crimes = await getCrimesByPoint(coordinatesRef.current[1], coordinatesRef.current[0]);
       console.log("Fetched crimes:", crimes);
       if (crimes.length > 0) {
         plotCrimes(map, crimes);
@@ -203,7 +204,7 @@ const Map = () => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/ezequielm/cij7hk832007dapktzdyaemih",
-      center: coordinates,
+      center: coordinatesRef.current,
       zoom: 15,
     });
 
@@ -219,19 +220,18 @@ const Map = () => {
         event.preventDefault();
         const { lng, lat } = event.lngLat;
 
-        console.log(startPlaced)
-    
         if (!startPlacedRef.current) {  // Check ref value instead of state
+          new mapboxgl.Marker({ color: 'red' })
+          .setLngLat([lng, lat])
+          .addTo(map);
+          
           startPlacedRef.current = true;  // Update the ref directly
     
-          new mapboxgl.Marker({ color: 'red' })
-            .setLngLat([lng, lat])
-            .addTo(map);
         }
     
     
         // Optional: set the coordinates (if you still need them to update)
-        // setCoordinates([lng, lat]);
+        coordinatesRef.current = [lng, lat];  // Update the ref directly
     
         // Get pixel position of click
         const canvas = map.getCanvas();
@@ -241,7 +241,7 @@ const Map = () => {
     });
 
     return () => map.remove();
-  }, [coordinates]);
+  }, coordinatesRef.current);
 
   return (
     <div className="map-wrapper">
