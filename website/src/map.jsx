@@ -146,9 +146,16 @@ const Map = () => {
 
     map.on("click", async (event) => {
       if (lock && setLock) {
+        
         event.preventDefault();
         const { lng, lat } = event.lngLat;
-        setCoordinates([lng, lat]);
+
+        // Place the marker on the map at the clicked location
+        new mapboxgl.Marker({color: 'black'})
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+        // setCoordinates([lng, lat]);        
 
         // Get pixel position of click
         const canvas = map.getCanvas();
