@@ -1,7 +1,7 @@
 import requests
 
-url = "https://europe-north1-evrp2-426411.cloudfunctions.net/get-route"
-payload = {"lat": 55, "long": 52}
+url = "https://get-route-863661396582.europe-north1.run.app/get-route"
+payload = {"lat": 51.573128, "long": 0.481039}
 
 response = requests.post(url, json=payload)
 
