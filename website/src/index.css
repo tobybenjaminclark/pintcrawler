@@ -100,7 +100,7 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f30000;
+    background-color: #cdbb9e;
   }
 }
 
@@ -220,4 +220,15 @@ input[type="range"]::-moz-range-thumb {
   background: #000000; /* Thumb color */
   border-radius: 50%; /* Make the thumb circular */
   cursor: pointer; /* Change cursor when hovering over the thumb */
+}
+
+.signed-text {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.signed-text:hover {
+  color: red;
 }
