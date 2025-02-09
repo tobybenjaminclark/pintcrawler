@@ -8,7 +8,7 @@ import re
 import math
 from geopy.distance import geodesic
 from concurrent.futures import ThreadPoolExecutor
-from get_pubs import PubData, get_pubs, normalize_pub_ratings
+from get_pubs import PubData, get_pubs, normalize_pub_ratings, get_unique_crimes_for_pubs, adjust_pub_ratings_for_crime
 from api_key import API_KEY
 from visualise import visualize_graph
 from route import Route, Pub  # Import your dataclasses for route segments
@@ -29,7 +29,7 @@ MAX_PUBS = 6
 
 def get_vertex_weight(current: Location) -> float:
 
-    if VISIT_BAD_PUBS:
+    if VISIT_BAD_PUBS or WARRIOR_MODE:
         return -current.attr["rating"]
     elif not VISIT_BAD_PUBS:
         return current.attr["rating"]
@@ -232,8 +232,8 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     global EDGE_WEIGHT
 
     # Configure attributes
-    print("WARRIOR_MODE is {}".format(WARRIOR_MODE))
     WARRIOR_MODE = attr["warrior_mode"]
+    print("WARRIOR_MODE is {}".format(WARRIOR_MODE))
 
     if attr["maximise_rating"] == 1: VISIT_BAD_PUBS = False
     elif attr["maximise_rating"] == 0: VISIT_BAD_PUBS = True
@@ -253,9 +253,23 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
     radius_km = attr["range"]
     print(latitude,longitude)
     pubs = get_pubs(API_KEY, latitude, longitude, radius_km)
-    pubs = normalize_pub_ratings(pubs)
+
+    # Now, for each pub we want to incorporate nearby crime:
+    unique_crimes = get_unique_crimes_for_pubs(pubs, date="2024-01")
+    print(f"\nTotal unique crimes found across all pubs: {len(unique_crimes)}")
+
+    if WARRIOR_MODE: crime_penalty = -10
+    else: crime_penalty = 3
+    adjust_pub_ratings_for_crime(pubs, unique_crimes, threshold_km=0.3, penalty_per_crime=crime_penalty)
 
     routes = fetch_pub_routes(pubs)
+
+    for pub in pubs:
+        if VISIT_BAD_PUBS or WARRIOR_MODE:
+            pub.rating = -pub.rating
+        print(f"{pub.name} is rated {pub.rating}")
+
+
     graph, pub_map = create_graph_from_routes(routes, pubs)
     graph = add_shortest_edges_to_connect_graph(graph, pubs, pub_map)
 
@@ -294,11 +308,13 @@ def main_router(lat, long, attr, show = False) -> list[Route]:
                     loc=(best_node[i].latitude, best_node[i].longitude),
                     rating=best_node[i].attr.get("rating", 0)
                 )
+
                 end_pub = Pub(
                     name=best_node[i + 1].name,
                     loc=(best_node[i + 1].latitude, best_node[i + 1].longitude),
                     rating=best_node[i + 1].attr.get("rating", 0)
                 )
+
                 best_route_segments.append(Route(
                     start_node=start_pub,
                     end_node=end_pub,

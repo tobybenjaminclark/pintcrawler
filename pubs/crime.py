@@ -67,17 +67,10 @@ def plot_crimes(crimes, lat, lng):
     crime_map.save("crime_map.html")
 
 if __name__ == '__main__':
-    # Example 1: Specific point query
-    lat, lng = 51.569232, 0.451880  # Example coordinates
+    lat, lng = 51.569232, 0.451880
     crimes_point = get_crimes_by_point(lat, lng, date="2024-01")
 
     if crimes_point is not None:
         print(f"Crimes near the point ({lat}, {lng}):")
         for crime in crimes_point:
             print(crime)
-        
-        # Plot the crimes on the map
-        plot_crimes(crimes_point, lat, lng)
-        print("Map saved as 'crime_map.html'. Open this file in your browser to view the map.")
-    else:
-        print("No data for the specific point query.")
