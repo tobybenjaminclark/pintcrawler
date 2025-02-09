@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DistanceSlider from "./DistanceSlider.jsx";
 import { Push } from "./link.jsx";
+import { getCrimesByPoint, plotCrimes } from "./crimeData";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
@@ -100,6 +101,15 @@ const Map = () => {
           }
         });
       }
+      // Fetch and plot crimes on the map
+    const crimes = await getCrimesByPoint(coordinates[1], coordinates[0]);
+    console.log("Fetched crimes:", crimes); 
+    if (crimes.length > 0) {
+        plotCrimes(map, crimes);
+    } else {
+          console.log("No crimes found at this location");
+    };
+  
     } catch (error) {
       console.error("Error in send function:", error);
       setLoading(false); // Ensure loading is false in case of an error
