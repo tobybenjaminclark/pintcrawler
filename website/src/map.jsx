@@ -7,6 +7,10 @@ import { getCrimesByPoint, plotCrimes } from "./crimeData";
 import warriorImg from "./warrior.png";  
 import otherImg from "./other.png";      
 
+import peasantImg from "./warrior.png"; 
+import knightImg from "./warrior.png";  
+import nomadImg from "./warrior.png"
+
 
 mapboxgl.accessToken = "pk.eyJ1IjoiYWxleG5lYWwyMDMwIiwiYSI6ImNtNncycWliNzBiMDAybHNkb3Fma3l1NmcifQ.mvN864hJb5SV2KW6yyYF8g"; // Replace with your token
 
@@ -200,10 +204,54 @@ const Map = () => {
           </div>
           <p style={{ fontSize: 25 }}>Will to Wander</p>
           <div className="rating">
-            <button onClick={low} style={{ backgroundColor: walk === 0 ? '#a4764a' : '' }}>Peasant</button>
-            <button onClick={medium} style={{ backgroundColor: walk === 1 ? '#A6A6A6' : '' }}>Knight</button>
-            <button onClick={high} style={{ backgroundColor: walk === 2 ? '#d4af37' : '' }}>Nomad</button>
-          </div>
+          <button
+            onClick={low}
+            style={{
+              backgroundColor: walk === 0 ? "#a4764a" : "",
+              border: "2px solid black",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={peasantImg}
+              alt="Peasant"
+              style={{ width: "30px", height: "30px" }}
+            />
+            <div>Peasant</div>
+          </button>
+
+          <button
+            onClick={medium}
+            style={{
+              backgroundColor: walk === 1 ? "#A6A6A6" : "",
+              border: "2px solid black",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={knightImg}
+              alt="Knight"
+              style={{ width: "30px", height: "30px" }}
+            />
+            <div>Knight</div>
+          </button>
+
+          <button
+            onClick={high}
+            style={{
+              backgroundColor: walk === 2 ? "#d4af37" : "",
+              border: "2px solid black",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={nomadImg}
+              alt="Nomad"
+              style={{ width: "30px", height: "30px" }}
+            />
+            <div>Nomad</div>
+          </button>
+        </div>
           <p style={{ fontSize: 25 }}>{title}</p>
           <div className="warrior" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
   <p1 style={{ marginRight: '10px', flex: 1 }}>{description}</p1>
